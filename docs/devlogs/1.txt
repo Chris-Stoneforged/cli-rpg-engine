@@ -1,0 +1,5 @@
+Jul 21st 2026
+
+Today I have set up the project, having never used C# outside the context of Unity. It took a long time to get the environment set up, most of the delay owing to getting the C# LSP working in Neovim (but I refued to use VS Code).
+
+The first goal is to get a small demo going of a single room with a single encounter...

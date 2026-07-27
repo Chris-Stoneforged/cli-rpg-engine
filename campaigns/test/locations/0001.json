@@ -1,0 +1,11 @@
+{
+	"id": "0001",
+	"description": "Nothing up here except empty, decrepit rooms",
+	"doors": [
+		{
+			"id": "0001",
+			"destination_id": "0000",
+			"call_to_action": "Go back down"
+		}
+	]
+}

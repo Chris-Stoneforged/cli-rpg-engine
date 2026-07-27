@@ -1,0 +1,11 @@
+{
+	"id": "0000",
+	"description": "An old run-down inn at the last frontier. It seems empty...",
+	"doors": [
+		{
+			"id": "0000",
+			"destination_id": "0001",
+			"call_to_action": "Take the stairs"
+		}
+	]
+}
