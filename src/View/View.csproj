@@ -1,0 +1,19 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <ItemGroup>
+    <ProjectReference Include="..\View.Definitions\View.Definitions.csproj" />
+    <ProjectReference Include="..\UserInterface.Definitions\UserInterface.Definitions.csproj" />
+    <ProjectReference Include="..\Models.Definitions\Models.Definitions.csproj" />
+    <ProjectReference Include="..\Requests.Definitions\Requests.Definitions.csproj" />
+    <ProjectReference Include="..\Resources.Definitions\Resources.Definitions.csproj" />
+    <ProjectReference Include="..\Menu\Menu.csproj" />
+    <ProjectReference Include="..\Requests\Requests.csproj" />
+  </ItemGroup>
+
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+
+</Project>

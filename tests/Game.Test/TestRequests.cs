@@ -24,7 +24,7 @@ public class TestRequests
 	[Fact]
 	public void TestRegisterHandler()
 	{
-		var rp = new ReqeustProcessor();
+		var rp = new RequestRegister();
 		var handler = new Mock<TestRequestHandler>();
 		rp.RegisterRequestHandler(handler);
 

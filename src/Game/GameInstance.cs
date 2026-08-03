@@ -1,20 +1,36 @@
-using Game.Events;
-using Game.Requests;
-using Game.Resources;
-using Game.State;
-using Game.UserInterface;
+using Controllers;
+using Events;
+using Models;
+using Requests;
+using UserInterface;
+using View;
+using Resources;
+using View.Definitions;
 
 namespace Game;
 
-public class GameInstance
+public class GameInstance(
+	ResourceManager resourceManager,
+	UserInterface.UserInterface ui,
+	RequestRegister requestRegister,
+	EventDispatcher eventDispatcher,
+	ModelRegister modelRegister
+)
 {
-	private readonly Stack<IGameState> _stateStack = new();
+	private readonly Stack<IView> _viewStack = new();
+	private readonly ResourceManager _resourceManager = resourceManager;
+	private readonly UserInterface.UserInterface _ui = ui;
+	private readonly RequestRegister _requestRegister = requestRegister;
+	private readonly EventDispatcher _eventDispatcher = eventDispatcher;
+	private readonly ModelRegister _modelRegister = modelRegister;
 
-	public static bool TryLoad(string campaignPath, out GameInstance instance)
+	private bool _gameRunning = true;
+
+	public static bool TryCreate(string campaignPath, out GameInstance? instance)
 	{
-		instance = new GameInstance();
+		instance = null;
 
-		var ui = new UIController(Console.Out, Console.In);
+		var ui = new UserInterface.UserInterface(Console.Out, Console.In);
 		if (!Path.Exists(campaignPath))
 		{
 			campaignPath = ui.PushUserInput("Enter path to campagin", [new ValidPathRestriction()]);
@@ -26,50 +42,66 @@ public class GameInstance
 			return false;
 		}
 
-		var worldState = new WorldState();
-		var locationId = worldState.CurrentLocationId;
-		var location = resourceManager.GetLocation(locationId);
-		if (location == null)
-		{
-			return false;
-		}
-
-		instance.PushState(new LocationState());
-
+		var models = new ModelRegister()
+			.RegisterModel<LocationModel>();
 		var eventDispatcher = new EventDispatcher();
-		var requestProcessor = new RequestProcessor();
-		requestProcessor.RegisterHandler<PushGameStateRequest>(instance.HandlePushStateRequest);
+		var requestRegister = new RequestRegister();
 
-		GameContext.Create(ui, requestProcessor, worldState, resourceManager, eventDispatcher);
+		var locationController = new LocationController(requestRegister, models, resourceManager);
 
-		// Initialize game systems
-		var locationManager = new LocationManager();
+		instance = new GameInstance(
+			resourceManager,
+			ui,
+			requestRegister,
+			eventDispatcher,
+			models
+		);
+
+		requestRegister.RegisterHandler<PushViewRequest>(instance.HandlePushViewRequest);
+		requestRegister.RegisterHandler<PopViewRequest>(instance.HandlePopViewRequest);
+		requestRegister.RegisterHandler<QuitGameRequest>(instance.HandleQuitGameRequest);
+		instance.PushView(new MainMenuView());
 
 		return true;
-
 	}
 
 	public void Run()
 	{
-		while (true)
+		while (_gameRunning)
 		{
-			if (!_stateStack.TryPeek(out var currentState)) break;
+			if (!_viewStack.TryPeek(out var currentState)) break;
 			currentState.Loop();
 		}
 	}
 
-	public void PushState(IGameState state)
+	public void PushView(IView view)
 	{
-		_stateStack.Push(state);
+		view.Initialize(_ui, _modelRegister, _requestRegister);
+		_viewStack.Push(view);
 	}
 
-	public void PopState()
+	public void PopView()
 	{
-		_stateStack.Pop();
+		var view = _viewStack.Pop();
+		view.CleanUp();
 	}
 
-	void HandlePushStateRequest(PushGameStateRequest request)
+	void HandlePushViewRequest(PushViewRequest request)
 	{
-		PushState(request.State);
+		PushView(request.View);
+	}
+
+	void HandlePopViewRequest(PopViewRequest request)
+	{
+		if (!_viewStack.TryPeek(out var currentState)) return;
+		if (currentState == request.View)
+		{
+			PopView();
+		}
+	}
+
+	void HandleQuitGameRequest(QuitGameRequest _)
+	{
+		_gameRunning = false;
 	}
 }

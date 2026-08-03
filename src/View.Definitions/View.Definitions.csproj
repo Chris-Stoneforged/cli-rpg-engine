@@ -1,0 +1,15 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <ItemGroup>
+    <ProjectReference Include="..\UserInterface.Definitions\UserInterface.Definitions.csproj" />
+    <ProjectReference Include="..\Requests.Definitions\Requests.Definitions.csproj" />
+    <ProjectReference Include="..\Models.Definitions\Models.Definitions.csproj" />
+  </ItemGroup>
+
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+
+</Project>

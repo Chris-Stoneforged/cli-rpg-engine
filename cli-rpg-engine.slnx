@@ -1,10 +1,19 @@
 <Solution>
   <Folder Name="/src/">
-    <Project Path="src/Editor/Editor.csproj" />
+    <Project Path="src/Controllers/Controllers.csproj" />
+    <Project Path="src/Events.Definitions/Events.Definitions.csproj" />
+    <Project Path="src/Events/Events.csproj" />
     <Project Path="src/Game/Game.csproj" />
-  </Folder>
-  <Folder Name="/tests/">
-    <Project Path="tests/Editor.Test/Editor.Test.csproj" />
-    <Project Path="tests/Game.Test/Game.Test.csproj" />
+    <Project Path="src/Menu/Menu.csproj" />
+    <Project Path="src/Models.Definitions/Models.Definitions.csproj" />
+    <Project Path="src/Models/Models.csproj" />
+    <Project Path="src/Requests.Definitions/Requests.Definitions.csproj" />
+    <Project Path="src/Requests/Requests.csproj" />
+    <Project Path="src/Resources.Definitions/Resources.Definitions.csproj" />
+    <Project Path="src/Resources/Resources.csproj" />
+    <Project Path="src/UserInterface.Definitions/UserInterface.Definitions.csproj" />
+    <Project Path="src/UserInterface/UserInterface.csproj" />
+    <Project Path="src/View.Definitions/View.Definitions.csproj" />
+    <Project Path="src/View/View.csproj" />
   </Folder>
 </Solution>
