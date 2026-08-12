@@ -2,106 +2,117 @@ using Controllers;
 using Events;
 using Models;
 using Requests;
-using UserInterface;
 using View;
 using Resources;
-using View.Definitions;
+using Save;
 
 namespace Game;
 
-public class GameInstance(
-	ResourceManager resourceManager,
-	UserInterface.UserInterface ui,
-	RequestRegister requestRegister,
-	EventDispatcher eventDispatcher,
-	ModelRegister modelRegister
-)
+public class GameInstance
 {
-	private readonly Stack<IView> _viewStack = new();
-	private readonly ResourceManager _resourceManager = resourceManager;
-	private readonly UserInterface.UserInterface _ui = ui;
-	private readonly RequestRegister _requestRegister = requestRegister;
-	private readonly EventDispatcher _eventDispatcher = eventDispatcher;
-	private readonly ModelRegister _modelRegister = modelRegister;
+	private readonly ViewManager _viewManager;
+	private readonly RequestManager _requestManager;
+	private readonly EventManager _eventManager;
+	private readonly ModelManager _modelManager;
+	private readonly SaveManager _saveManager;
+
+	private readonly LocationController _locationController;
+
+	private GameInstance(
+		ResourceManager resourceManager,
+		ViewManager viewManager
+	)
+	{
+		_modelManager = ModelManager.Create();
+		_eventManager = new EventManager();
+		_requestManager = new RequestManager();
+		_saveManager = new SaveManager();
+		_viewManager = viewManager;
+		_viewManager.Initialize(_requestManager, _modelManager);
+
+		var controllerContext = new ControllerContext(
+			_modelManager,
+			_modelManager,
+			_requestManager,
+			_eventManager,
+			_eventManager,
+			resourceManager,
+			_saveManager
+		);
+
+		_locationController = new LocationController(controllerContext);
+
+		_requestManager.RegisterHandler<QuitGameRequest>(HandleQuitGameRequest);
+		_requestManager.RegisterHandler<NewGameRequest>(HandleCreateSaveRequest);
+		_requestManager.RegisterHandler<SaveGameRequest>(HandleSaveGameRequest);
+		_requestManager.RegisterHandler<LoadGameRequest>(HandleLoadGameRequest);
+		_requestManager.RegisterHandler<ReturnToMainMenuRequest>(HandleReturnToMainMenuRequest);
+
+		EnterMainMenu();
+	}
 
 	private bool _gameRunning = true;
 
-	public static bool TryCreate(string campaignPath, out GameInstance? instance)
+	public static async Task<GameInstance?> Create(string campaignPath)
 	{
-		instance = null;
-
-		var ui = new UserInterface.UserInterface(Console.Out, Console.In);
-		if (!Path.Exists(campaignPath))
-		{
-			campaignPath = ui.PushUserInput("Enter path to campagin", [new ValidPathRestriction()]);
-		}
-
 		var resourceManager = new ResourceManager();
-		if (!resourceManager.LoadCampaign(campaignPath))
-		{
-			return false;
-		}
+		var viewManager = new ViewManager();
 
-		var models = new ModelRegister()
-			.RegisterModel<LocationModel>();
-		var eventDispatcher = new EventDispatcher();
-		var requestRegister = new RequestRegister();
-
-		var locationController = new LocationController(requestRegister, models, resourceManager);
-
-		instance = new GameInstance(
-			resourceManager,
-			ui,
-			requestRegister,
-			eventDispatcher,
-			models
-		);
-
-		requestRegister.RegisterHandler<PushViewRequest>(instance.HandlePushViewRequest);
-		requestRegister.RegisterHandler<PopViewRequest>(instance.HandlePopViewRequest);
-		requestRegister.RegisterHandler<QuitGameRequest>(instance.HandleQuitGameRequest);
-		instance.PushView(new MainMenuView());
-
-		return true;
+		return !await viewManager.ShowLoad(
+			resourceManager.LoadCampaign(campaignPath)
+		) ?
+			null :
+			new GameInstance(resourceManager, viewManager);
 	}
 
-	public void Run()
+	public async Task Run()
 	{
 		while (_gameRunning)
 		{
-			if (!_viewStack.TryPeek(out var currentState)) break;
-			currentState.Loop();
+			await _viewManager.Show();
 		}
 	}
 
-	public void PushView(IView view)
+	void EnterMainMenu()
 	{
-		view.Initialize(_ui, _modelRegister, _requestRegister);
-		_viewStack.Push(view);
+		_viewManager.ResetStack();
+		_viewManager.ShowView(new MainMenuView(_saveManager.SaveProfiles));
 	}
 
-	public void PopView()
+	void EnterGame()
 	{
-		var view = _viewStack.Pop();
-		view.CleanUp();
+		_viewManager.ResetStack();
+		_viewManager.ShowView(new LocationView());
 	}
 
-	void HandlePushViewRequest(PushViewRequest request)
-	{
-		PushView(request.View);
-	}
-
-	void HandlePopViewRequest(PopViewRequest request)
-	{
-		if (!_viewStack.TryPeek(out var currentState)) return;
-		if (currentState == request.View)
-		{
-			PopView();
-		}
-	}
-
-	void HandleQuitGameRequest(QuitGameRequest _)
+	void HandleQuitGameRequest(QuitGameRequest request)
 	{
 		_gameRunning = false;
+	}
+
+	void HandleCreateSaveRequest(NewGameRequest request)
+	{
+		if (_saveManager.CreateNewSaveFile())
+		{
+			EnterGame();
+		}
+	}
+
+	void HandleSaveGameRequest(SaveGameRequest request)
+	{
+		_saveManager.SaveGameData();
+	}
+
+	void HandleLoadGameRequest(LoadGameRequest request)
+	{
+		if (_saveManager.LoadSaveProfile(request.ProfileInfo))
+		{
+			EnterGame();
+		}
+	}
+
+	void HandleReturnToMainMenuRequest(ReturnToMainMenuRequest request)
+	{
+		EnterMainMenu();
 	}
 }

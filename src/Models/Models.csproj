@@ -3,6 +3,7 @@
   <ItemGroup>
     <ProjectReference Include="..\Models.Definitions\Models.Definitions.csproj" />
     <ProjectReference Include="..\Resources.Definitions\Resources.Definitions.csproj" />
+    <ProjectReference Include="..\Debug\Debug.csproj" />
   </ItemGroup>
 
   <PropertyGroup>

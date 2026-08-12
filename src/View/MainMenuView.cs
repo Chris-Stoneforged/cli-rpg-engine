@@ -1,53 +1,93 @@
-using Menu;
-using Models.Definitions;
-using Requests.Definitions;
 using Requests;
-using UserInterface.Definitions;
+using Spectre.Console;
 using View.Definitions;
+using View.MenuOptions;
+using Save.Definitions;
 
 namespace View;
 
-public class MainMenuView : IView
+public class MainMenuView(IReadOnlyList<ISaveProfile> saveProfiles) : AView
 {
-	private IUserInterface? _ui;
-	private IRequestMaker? _requestMaker;
-
-	public void CleanUp() { }
-
-	public void Initialize(IUserInterface ui, IModelGetter _, IRequestMaker requestMaker)
+	private enum MenuState
 	{
-		_ui = ui;
-		_requestMaker = requestMaker;
+		MAIN,
+		LOAD
+	};
+
+	private MenuState _state = MenuState.MAIN;
+
+	private readonly IReadOnlyList<ISaveProfile> _saveProfiles = saveProfiles;
+
+	public override void CleanUp() { }
+
+	public override async Task Loop()
+	{
+		switch (_state)
+		{
+			case MenuState.MAIN:
+				RenderMainState();
+				break;
+			case MenuState.LOAD:
+				RenderLoadState();
+				break;
+		}
 	}
 
-	public void Loop()
+	private void RenderMainState()
 	{
-		Console.WriteLine("TALES OF STONE");
-		Console.WriteLine();
-
-		var menu = new Menu.Menu();
-		menu.AddOption(new BasicMenuOption("New Game", OnNewGameSelected));
-		menu.AddOption(new BasicMenuOption("Credits", OnCreditsSelected));
-		menu.AddOption(new BasicMenuOption("Quit", OnQuitSelected));
-
-		if (_ui != null)
+		var options = new List<IMenuOption>();
+		options.Add(new BasicMenuOption("New Game", OnNewGameSelected));
+		if (_saveProfiles.Count > 0)
 		{
-			menu.Execute(_ui);
+			options.Add(new BasicMenuOption("Load Game", () => _state = MenuState.LOAD));
 		}
+		options.Add(new BasicMenuOption("Credits", OnCreditsSelected));
+		options.Add(new BasicMenuOption("Quit", OnQuitSelected));
+
+		var prompt = new SelectionPrompt<IMenuOption>()
+			.Title("Welcome to the game")
+			.WrapAround()
+			.UseConverter(m => m.CallToAction)
+			.AddChoices(options);
+
+		var chosenOption = AnsiConsole.Prompt(prompt);
+		chosenOption.Callback.Invoke();
+	}
+
+	private void RenderLoadState()
+	{
+		SaveProfileOption CreateOption(ISaveProfile profile)
+		{
+			var o = new SaveProfileOption(profile);
+			o.Initialize(Ctx);
+			return o;
+		}
+
+		var choices = _saveProfiles.Select(CreateOption).Cast<IMenuOption>().ToList();
+		choices.Add(new BasicMenuOption("Back", () => _state = MenuState.MAIN));
+
+		var prompt = new SelectionPrompt<IMenuOption>()
+			.Title("Select a save profile")
+			.WrapAround()
+			.UseConverter(m => m.CallToAction)
+			.AddChoices(choices);
+
+		var chosenOption = AnsiConsole.Prompt(prompt);
+		chosenOption.Callback.Invoke();
 	}
 
 	private void OnNewGameSelected()
 	{
-
+		Ctx.RequestDispatcher.MakeRequest(new NewGameRequest());
 	}
 
 	private void OnCreditsSelected()
 	{
-		_requestMaker?.MakeRequest(new PushViewRequest(new CreditsView()));
+		Ctx.ViewManager.ShowView(new CreditsView());
 	}
 
 	private void OnQuitSelected()
 	{
-		_requestMaker?.MakeRequest(new QuitGameRequest());
+		Ctx.RequestDispatcher.MakeRequest(new QuitGameRequest());
 	}
 }

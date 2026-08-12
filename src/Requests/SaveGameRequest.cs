@@ -2,4 +2,4 @@ using Requests.Definitions;
 
 namespace Requests;
 
-public class QuitGameRequest : IRequest { }
+public class SaveGameRequest : IRequest { }

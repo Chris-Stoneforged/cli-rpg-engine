@@ -1,12 +1,7 @@
-using Models.Definitions;
-using Requests.Definitions;
-using UserInterface.Definitions;
-
 namespace View.Definitions;
 
 public interface IView
 {
-	void Initialize(IUserInterface ui, IModelGetter modelGetter, IRequestMaker requestMaker);
+	Task Loop();
 	void CleanUp();
-	void Loop();
 }

@@ -1,4 +1,4 @@
-namespace Menu;
+namespace View.Definitions;
 
 public interface IMenuOption
 {

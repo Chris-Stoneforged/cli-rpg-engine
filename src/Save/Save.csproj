@@ -1,7 +1,12 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <ItemGroup>
-    <ProjectReference Include="..\UserInterface.Definitions\UserInterface.Definitions.csproj" />
+    <ProjectReference Include="..\Debug\Debug.csproj" />
+    <ProjectReference Include="..\Save.Definitions\Save.Definitions.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Newtonsoft.Json" Version="13.0.4" />
   </ItemGroup>
 
   <PropertyGroup>

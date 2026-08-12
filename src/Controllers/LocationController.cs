@@ -1,41 +1,56 @@
 using Models;
 using Models.Definitions;
 using Requests;
-using Requests.Definitions;
-using Resources.Definitions;
 using Resources.Definitions.Entities;
+using Save;
 
 namespace Controllers;
 
 public class LocationController
 {
-	private readonly ModelRegister _modelRegister;
-	private readonly IEntityLoader _entityLoader;
+	private readonly ControllerContext _ctx;
 
-	public LocationController(
-		IRequestRegister requestRegister,
-		ModelRegister modelRegister,
-		IEntityLoader entityLoader
-	)
+	public LocationController(ControllerContext context)
 	{
-		_modelRegister = modelRegister;
-		_entityLoader = entityLoader;
+		_ctx = context;
+		_ctx.RequestListener.RegisterHandler<OpenDoorRequest>(HandleOpenDoorRequest);
 
-		requestRegister.RegisterHandler<OpenDoorRequest>(HandleOpenDoorRequest);
+		_ctx.SaveSystem.RegisterLoadHandler<LocationSaveData>("location", OnLocationDataLoaded);
+		_ctx.SaveSystem.RegisterSaveHandler("location", GetLocationSaveData);
 	}
 
 	private void HandleOpenDoorRequest(OpenDoorRequest request)
 	{
-		var locationModel = _modelRegister.GetModel<ILocationModel>();
+		var locationModel = _ctx.ModelGetter.GetModel<ILocationModel>();
 		if (locationModel == null) return;
 
 		if (request.LocationId != locationModel.CurrentLocation?.Id) return;
 
-		var newLocation = _entityLoader.LoadEntity<Location>(request.DestinationId);
+		var newLocation = _ctx.EntityLoader.LoadEntity<Location>(request.DestinationId);
 		if (newLocation == null) return;
 
-		_modelRegister.UpdateModel<LocationModel>(
+		_ctx.ModelUpdater.UpdateModel<LocationModel>(
 			l => l.CurrentLocation = newLocation
 		);
 	}
+
+	#region SAVE_AND_LOAD
+	private void OnLocationDataLoaded(LocationSaveData saveData)
+	{
+		var location = _ctx.EntityLoader.LoadEntity<Location>(saveData.CurrentLocationId);
+		if (location == null) return;
+
+		_ctx.ModelUpdater.UpdateModel<LocationModel>(
+			m => m.CurrentLocation = location
+		);
+	}
+
+	private LocationSaveData? GetLocationSaveData()
+	{
+		var locationModel = _ctx.ModelGetter.GetModel<ILocationModel>();
+		if (locationModel == null) return null;
+
+		return new LocationSaveData() { CurrentLocationId = locationModel.CurrentLocation?.Id ?? "" };
+	}
+	#endregion
 }

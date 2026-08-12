@@ -1,8 +1,9 @@
+using Debug;
 using Events.Definitions;
 
 namespace Events;
 
-public class EventDispatcher : IEventRegister
+public class EventManager : IEventListener, IEventDispatcher
 {
 	private interface IEventListener { }
 
@@ -19,9 +20,11 @@ public class EventDispatcher : IEventRegister
 	{
 		if (!_eventListeners.TryGetValue(typeof(TEvent), out var listeners))
 		{
+			DebugLog.Warn($"No event listeners of type {typeof(TEvent).Name}");
 			return;
 		}
 
+		DebugLog.Info($"Dispatching event {@event}");
 		foreach (var listener in listeners)
 		{
 			if (listener is not EventListener<TEvent> typedListener) continue;

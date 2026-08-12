@@ -1,44 +1,24 @@
-using Menu;
-using Models.Definitions;
-using Requests;
-using Requests.Definitions;
-using UserInterface.Definitions;
+using Spectre.Console;
 using View.Definitions;
+using View.MenuOptions;
 
 namespace View;
 
-public class CreditsView : IView
+public class CreditsView : AView
 {
-	private IUserInterface? _ui;
-	private IRequestMaker? _requestMaker;
+	public override void CleanUp() { }
 
-	public void CleanUp() { }
-
-	public void Initialize(IUserInterface ui, IModelGetter modelGetter, IRequestMaker requestMaker)
+	public override async Task Loop()
 	{
-		_ui = ui;
-		_requestMaker = requestMaker;
-	}
+		var backOption = new BackOption();
+		backOption.Initialize(Ctx);
 
-	public void Loop()
-	{
-		Console.WriteLine();
-		Console.WriteLine("Created by Stoneforged Games");
-		Console.WriteLine();
-		Console.WriteLine("  Lead Programmer - Chris Stone");
-		Console.WriteLine();
+		var prompt = new SelectionPrompt<IMenuOption>()
+			.Title("Created by Stoneforged Games")
+			.UseConverter(m => m.CallToAction)
+			.AddChoices(backOption);
 
-		var menu = new Menu.Menu();
-		menu.AddOption(new BasicMenuOption("Back", OnBackSelected));
-
-		if (_ui != null)
-		{
-			menu.Execute(_ui);
-		}
-	}
-
-	private void OnBackSelected()
-	{
-		_requestMaker?.MakeRequest(new PopViewRequest(this));
+		var chosenOption = AnsiConsole.Prompt(prompt);
+		chosenOption.Callback.Invoke();
 	}
 }

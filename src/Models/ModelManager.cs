@@ -1,27 +1,29 @@
+using Debug;
 using Models.Definitions;
 
 namespace Models;
 
-public class ModelRegister : IModelGetter
+public class ModelManager : IModelGetter, IModelUpdater
 {
 	private readonly List<IModel> _models = [];
-	private readonly Dictionary<Type, List<object>> _callbacks = [];
+	private readonly List<object> _callbacks = [];
 
-	public ModelRegister RegisterModel<TModel>() where TModel : class, IModel, new()
+	public static ModelManager Create()
 	{
+		return new ModelManager()
+			.RegisterModel<LocationModel>();
+	}
+
+	public ModelManager RegisterModel<TModel>() where TModel : class, IModel, new()
+	{
+		var type = typeof(TModel);
 		if (GetModel<TModel>() != null)
 		{
+			DebugLog.Warn($"Cannot register duplicate model of type {type.Name}");
 			return this;
 		}
 
 		_models.Add(new TModel());
-
-		var type = typeof(TModel);
-		if (!_callbacks.ContainsKey(type))
-		{
-			_callbacks.Add(type, []);
-		}
-
 		return this;
 	}
 
@@ -32,10 +34,7 @@ public class ModelRegister : IModelGetter
 
 	public void Notify<TModel>(Action<TModel> callback) where TModel : class, IModel
 	{
-		if (_callbacks.TryGetValue(typeof(TModel), out var list))
-		{
-			list.Add(callback);
-		}
+		_callbacks.Add(callback);
 	}
 
 	public TModel? GetAndNotify<TModel>(Action<TModel> callback) where TModel : class, IModel
@@ -46,19 +45,24 @@ public class ModelRegister : IModelGetter
 
 	public void UpdateModel<TModel>(Action<TModel> updateMethod) where TModel : class, IModel
 	{
-		if (_models.FirstOrDefault(m => m is TModel) is not TModel model) return;
+		if (_models.FirstOrDefault(m => m is TModel) is not TModel model)
+		{
+			DebugLog.Warn($"Cannot update model {typeof(TModel).Name} - Model is not registered");
+			return;
+		}
+
 		updateMethod(model);
 		SendUpdatedNotification(model);
-		//Save(_currentSavePath);
 	}
 
 	private void SendUpdatedNotification<TModel>(TModel updatedModel) where TModel : class, IModel
 	{
-		if (!_callbacks.TryGetValue(typeof(TModel), out var callbacks)) return;
-
-		foreach (var callback in callbacks.Cast<Action<TModel>>())
+		foreach (var callback in _callbacks)
 		{
-			callback.Invoke(updatedModel);
+			if (callback is Action<TModel> typedCallback)
+			{
+				typedCallback.Invoke(updatedModel);
+			}
 		}
 	}
 }

@@ -1,6 +1,6 @@
 namespace Requests.Definitions;
 
-public interface IRequestMaker
+public interface IRequestDispatcher
 {
 	void MakeRequest<TRequest>(TRequest request) where TRequest : IRequest;
 }

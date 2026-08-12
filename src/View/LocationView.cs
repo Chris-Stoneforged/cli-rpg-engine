@@ -1,60 +1,69 @@
-using Menu;
 using Models.Definitions;
-using Requests.Definitions;
-using Requests;
-using UserInterface.Definitions;
+using Spectre.Console;
 using View.Definitions;
+using View.MenuOptions;
 
 namespace View;
 
-public class LocationView : IView
+public class LocationView : AView
 {
-	private IUserInterface? _ui;
-	private IModelGetter? _modelGetter;
-	private IRequestMaker? _requestMaker;
+	private ILocationModel? _locationModel;
 
-	public void CleanUp() { }
-
-	public void Initialize(IUserInterface ui, IModelGetter modelGetter, IRequestMaker requestMaker)
+	public override void Initialize(ViewContext ctx)
 	{
-		_ui = ui;
-		_modelGetter = modelGetter;
-		_requestMaker = requestMaker;
+		base.Initialize(ctx);
+		_locationModel = ctx.ModelGetter.GetAndNotify<ILocationModel>(OnLocationModelUpdated);
 	}
 
-	public void Loop()
+	public void OnLocationModelUpdated(ILocationModel locationModel)
 	{
-		var locationModel = _modelGetter?.GetModel<ILocationModel>();
-		if (locationModel == null)
-		{
-			Console.WriteLine("Location model is null");
-			return;
-		}
-		var location = _modelGetter?.GetModel<ILocationModel>()?.CurrentLocation;
+		_locationModel = locationModel;
+	}
+
+	public override async Task Loop()
+	{
+		var location = _locationModel?.CurrentLocation;
 		if (location == null)
 		{
 			Console.WriteLine("CurrentLocation is null");
+			Console.ReadLine();
 			return;
 		}
 
-		Console.WriteLine();
-		Console.WriteLine(location.Description);
-
-		var menu = new Menu.Menu();
-		foreach (var door in location.Doors)
-		{
-			var request = new OpenDoorRequest(location.Id, door.DestinationId, door.Id);
-			menu.AddOption(
-				new BasicMenuOption(
-					door.CallToAction,
-					() => _requestMaker?.MakeRequest(request)
-				)
+		var prompt = new SelectionPrompt<IMenuOption>()
+			.Title(location.Description)
+			.UseConverter(m => m.CallToAction)
+			.WrapAround()
+			.AddChoices(
+				new BasicMenuOption("Navigate", OnNavigateSelected),
+				new BasicMenuOption("Search", OnSearchSelected),
+				new BasicMenuOption("Options", OnOptionsSelected)
 			);
-		}
 
-		if (_ui != null)
+		var chosenOption = AnsiConsole.Prompt(prompt);
+		chosenOption.Callback.Invoke();
+	}
+
+	public void OnNavigateSelected()
+	{
+		if (_locationModel != null && _locationModel.CurrentLocation != null)
 		{
-			menu.Execute(_ui);
+			Ctx.ViewManager.ShowView(new NavigateView(_locationModel.CurrentLocation));
 		}
+	}
+
+	private static void OnSearchSelected()
+	{
+
+	}
+
+	private void OnOptionsSelected()
+	{
+		Ctx.ViewManager.ShowView(new OptionsView());
+	}
+
+	public override void CleanUp()
+	{
+		// TODO: Remove listener
 	}
 }

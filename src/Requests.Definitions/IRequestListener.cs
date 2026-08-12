@@ -1,6 +1,6 @@
 namespace Requests.Definitions;
 
-public interface IRequestRegister
+public interface IRequestListener
 {
 	public void RegisterHandler<TRequest>(
 		Action<TRequest> handler,

@@ -2,15 +2,16 @@
 
 class Program
 {
-	static int Main(string[] args)
+	static async Task<int> Main(string[] args)
 	{
 		string campaignPath = args.Length >= 1 ? args[0] : "";
-		if (!GameInstance.TryCreate(campaignPath, out var gameInstance))
+		var gameInstance = await GameInstance.Create(campaignPath);
+		if (gameInstance == null)
 		{
 			return 1;
 		}
 
-		gameInstance?.Run();
+		await gameInstance.Run();
 		return 0;
 	}
 }

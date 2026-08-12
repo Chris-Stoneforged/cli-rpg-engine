@@ -1,8 +1,9 @@
 using Requests.Definitions;
+using Debug;
 
 namespace Requests;
 
-public class RequestRegister : IRequestRegister, IRequestMaker
+public class RequestManager : IRequestDispatcher, IRequestListener
 {
 	private interface IRequestHandler { }
 
@@ -21,12 +22,14 @@ public class RequestRegister : IRequestRegister, IRequestMaker
 	{
 		if (!_requestHandlers.TryGetValue(typeof(TRequest), out var handlers))
 		{
+			DebugLog.Warn($"No request handers for type {typeof(TRequest).Name}");
 			return;
 		}
 
+		DebugLog.Info($"Making request {request}");
 		foreach (var handler in handlers)
 		{
-			if (request.IsConsumed) break;
+			if (request is AGameRequest gameRequest && gameRequest.IsConsumed) break;
 			if (handler is not RequestHandler<TRequest> typedHandler) continue;
 			typedHandler.Callback.Invoke(request);
 		}

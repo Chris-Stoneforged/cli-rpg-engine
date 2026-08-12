@@ -2,7 +2,7 @@ using Requests.Definitions;
 
 namespace Requests;
 
-public abstract class ARequest : IRequest
+public abstract class AGameRequest : IRequest
 {
 	public bool IsConsumed { get; private set; }
 
