@@ -28,7 +28,7 @@ public class GameInstance
 		_requestManager = new RequestManager();
 		_saveManager = new SaveManager();
 		_viewManager = viewManager;
-		_viewManager.Initialize(_requestManager, _modelManager);
+		_viewManager.Initialize(_requestManager, _modelManager, _saveManager);
 
 		var controllerContext = new ControllerContext(
 			_modelManager,
@@ -76,7 +76,7 @@ public class GameInstance
 	void EnterMainMenu()
 	{
 		_viewManager.ResetStack();
-		_viewManager.ShowView(new MainMenuView(_saveManager.SaveProfiles));
+		_viewManager.ShowView(new MainMenuView());
 	}
 
 	void EnterGame()

@@ -1,4 +1,4 @@
-namespace View.MenuOptions;
+namespace View.Menu.Options;
 
 public class BackOption : AMenuOption
 {

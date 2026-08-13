@@ -1,6 +1,4 @@
-using Spectre.Console;
-using View.Definitions;
-using View.MenuOptions;
+using View.Menu;
 
 namespace View;
 
@@ -10,15 +8,9 @@ public class CreditsView : AView
 
 	public override async Task Loop()
 	{
-		var backOption = new BackOption();
-		backOption.Initialize(Ctx);
-
-		var prompt = new SelectionPrompt<IMenuOption>()
+		await new MenuBuilder()
 			.Title("Created by Stoneforged Games")
-			.UseConverter(m => m.CallToAction)
-			.AddChoices(backOption);
-
-		var chosenOption = AnsiConsole.Prompt(prompt);
-		chosenOption.Callback.Invoke();
+			.HasBackOption()
+			.Execute(Ctx);
 	}
 }

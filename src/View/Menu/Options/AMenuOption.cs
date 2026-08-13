@@ -1,6 +1,6 @@
 using View.Definitions;
 
-namespace View.MenuOptions;
+namespace View.Menu.Options;
 
 public abstract class AMenuOption : IMenuOption
 {

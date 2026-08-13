@@ -1,6 +1,6 @@
 using View.Definitions;
 
-namespace View.MenuOptions;
+namespace View.Menu.Options;
 
 public class BasicMenuOption(string callToAction, Action callback) : IMenuOption
 {

@@ -1,8 +1,7 @@
 using Requests;
-using Spectre.Console;
-using View.Definitions;
-using View.MenuOptions;
 using Resources.Definitions.Entities;
+using View.Menu.Options;
+using View.Menu;
 
 namespace View;
 
@@ -19,20 +18,13 @@ public class NavigateView(Location fromLocation) : AView
 				d.CallToAction,
 				() => OnLocationSelected(d.DestinationId, d.Id)
 			)
-		);
+		).ToArray();
 
-		var backOption = new BackOption();
-		backOption.Initialize(Ctx);
-
-		var prompt = new SelectionPrompt<IMenuOption>()
+		await new MenuBuilder()
 			.Title("Where do you want to go?")
-			.WrapAround()
-			.UseConverter(m => m.CallToAction)
-			.AddChoices(options)
-			.AddChoices(backOption);
-
-		var chosenOption = AnsiConsole.Prompt(prompt);
-		chosenOption.Callback.Invoke();
+			.HasBackOption()
+			.AddOptions(options)
+			.Execute(Ctx);
 	}
 
 	private void OnLocationSelected(string destinationId, string doorId)

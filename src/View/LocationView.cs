@@ -1,7 +1,7 @@
+using Debug;
 using Models.Definitions;
-using Spectre.Console;
-using View.Definitions;
-using View.MenuOptions;
+using View.Menu;
+using View.Menu.Options;
 
 namespace View;
 
@@ -25,23 +25,16 @@ public class LocationView : AView
 		var location = _locationModel?.CurrentLocation;
 		if (location == null)
 		{
-			Console.WriteLine("CurrentLocation is null");
-			Console.ReadLine();
+			DebugLog.Error("LocationView - Current location is null");
 			return;
 		}
 
-		var prompt = new SelectionPrompt<IMenuOption>()
+		await new MenuBuilder()
 			.Title(location.Description)
-			.UseConverter(m => m.CallToAction)
-			.WrapAround()
-			.AddChoices(
-				new BasicMenuOption("Navigate", OnNavigateSelected),
-				new BasicMenuOption("Search", OnSearchSelected),
-				new BasicMenuOption("Options", OnOptionsSelected)
-			);
-
-		var chosenOption = AnsiConsole.Prompt(prompt);
-		chosenOption.Callback.Invoke();
+			.AddOption(new BasicMenuOption("Navigate", OnNavigateSelected))
+			.AddOption(new BasicMenuOption("Search", OnSearchSelected))
+			.AddOption(new BasicMenuOption("Options", OnOptionsSelected))
+			.Execute(Ctx);
 	}
 
 	public void OnNavigateSelected()

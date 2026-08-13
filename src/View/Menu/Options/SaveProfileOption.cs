@@ -1,7 +1,7 @@
 using Requests;
 using Save.Definitions;
 
-namespace View.MenuOptions;
+namespace View.Menu.Options;
 
 public class SaveProfileOption(ISaveProfile profile) : AMenuOption
 {

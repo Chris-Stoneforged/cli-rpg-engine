@@ -1,7 +1,6 @@
 using Requests;
-using Spectre.Console;
-using View.Definitions;
-using View.MenuOptions;
+using View.Menu;
+using View.Menu.Options;
 
 namespace View;
 
@@ -11,21 +10,13 @@ public class OptionsView : AView
 
 	public override async Task Loop()
 	{
-		var backOption = new BackOption();
-		backOption.Initialize(Ctx);
-
-		var prompt = new SelectionPrompt<IMenuOption>()
-			.WrapAround()
-			.UseConverter(m => m.CallToAction)
-			.AddChoices(
-				new BasicMenuOption("Save Game", OnSaveGameSelected),
-				new BasicMenuOption("Load Game", OnLoadGameSelected),
-				new BasicMenuOption("Main Menu", OnMainMenuSelected),
-				backOption
-			);
-
-		var chosenOption = AnsiConsole.Prompt(prompt);
-		chosenOption.Callback.Invoke();
+		await new MenuBuilder()
+			.Title("Options")
+			.HasBackOption()
+			.AddOption(new BasicMenuOption("Save Game", OnSaveGameSelected))
+			.AddOption(new BasicMenuOption("Load Game", OnLoadGameSelected))
+			.AddOption(new BasicMenuOption("Main Menu", OnMainMenuSelected))
+			.Execute(Ctx);
 	}
 
 	private void OnMainMenuSelected()

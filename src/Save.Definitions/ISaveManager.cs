@@ -2,6 +2,8 @@ namespace Save.Definitions;
 
 public interface ISaveManager
 {
+	IReadOnlyList<ISaveProfile> Profiles { get; }
+
 	void RegisterSaveHandler<TSaveData>(
 		string saveKey,
 		SaveCallback<TSaveData> callback

@@ -26,7 +26,7 @@ public static class DebugLog
 #if DEBUG
 		using (new ConsoleColorBlock(ConsoleColor.Green))
 		{
-			//Console.WriteLine($"[{message}]");
+			Console.WriteLine($"[{message}]");
 		}
 #endif
 	}
@@ -36,7 +36,7 @@ public static class DebugLog
 #if DEBUG
 		using (new ConsoleColorBlock(ConsoleColor.Yellow))
 		{
-			//Console.WriteLine($"[{message}]");
+			Console.WriteLine($"[{message}]");
 		}
 #endif
 	}
@@ -46,7 +46,7 @@ public static class DebugLog
 #if DEBUG
 		using (new ConsoleColorBlock(ConsoleColor.Red))
 		{
-			//Console.WriteLine($"[{message}]");
+			Console.WriteLine($"[{message}]");
 		}
 #endif
 	}

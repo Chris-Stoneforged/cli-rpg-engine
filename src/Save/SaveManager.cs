@@ -28,7 +28,7 @@ public class SaveManager : ISaveManager
 		public Action<dynamic> Callback { get; } = callback;
 	}
 
-	public IReadOnlyList<ISaveProfile> SaveProfiles => _saveProfiles;
+	public IReadOnlyList<ISaveProfile> Profiles => _saveProfiles;
 
 	private const string SAVE_LOCATION = "/Users/chris/Documents/personal-projects/cli-rpg-engine/saves";
 
@@ -113,6 +113,7 @@ public class SaveManager : ISaveManager
 			return false;
 		}
 
+		_currentSave = saveProfile;
 		LoadGameData(saveData);
 		return true;
 	}

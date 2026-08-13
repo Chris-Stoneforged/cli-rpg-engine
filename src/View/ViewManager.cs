@@ -1,6 +1,6 @@
-using Debug;
 using Models.Definitions;
 using Requests.Definitions;
+using Save.Definitions;
 using Spectre.Console;
 using View.Definitions;
 
@@ -11,9 +11,13 @@ public class ViewManager() : IViewManager
 	private readonly Stack<IView> _viewStack = new();
 	private ViewContext? _viewContext = null;
 
-	public void Initialize(IRequestDispatcher requestDispatcher, IModelGetter modelGetter)
+	public void Initialize(
+		IRequestDispatcher requestDispatcher,
+		IModelGetter modelGetter,
+		ISaveManager saveManager
+	)
 	{
-		_viewContext = new(this, requestDispatcher, modelGetter);
+		_viewContext = new(this, requestDispatcher, modelGetter, saveManager);
 	}
 
 	public void ShowView(IView view)
