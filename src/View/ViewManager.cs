@@ -1,3 +1,4 @@
+using Debug;
 using Models.Definitions;
 using Requests.Definitions;
 using Save.Definitions;
@@ -41,6 +42,8 @@ public class ViewManager() : IViewManager
 	public async Task Show()
 	{
 		AnsiConsole.Clear();
+		ShowDebugLogs();
+
 		if (_viewStack.TryPeek(out var currentView))
 		{
 			await currentView.Loop();
@@ -83,5 +86,29 @@ public class ViewManager() : IViewManager
 					return await loader(loadContext);
 				}
 			);
+	}
+
+	private void ShowDebugLogs()
+	{
+#if DEBUG
+		var debugGrid = new Grid()
+			.AddColumn()
+			.AddColumn();
+		foreach (var message in DebugHistory.Messages)
+		{
+			var color = message.Severity switch
+			{
+				Severity.INFO => "purple",
+				Severity.WARN => "yellow",
+				Severity.ERROR => "red",
+				_ => throw new NotImplementedException()
+			};
+
+			debugGrid.AddRow(message.Severity.ToString(), $"[{color}]{message.Message}[/]");
+		}
+
+		var debugPanel = new Panel(debugGrid).Header("Debug Logs", Justify.Center).Expand();
+		AnsiConsole.Write(debugPanel);
+#endif
 	}
 }
