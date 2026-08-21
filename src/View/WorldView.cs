@@ -1,11 +1,13 @@
 using Debug;
 using Models.Definitions;
+using Spectre.Console;
+using Spectre.Console.Rendering;
 using View.Menu;
 using View.Menu.Options;
 
 namespace View;
 
-public class LocationView : AView
+public class WorldView : AView
 {
 	private ILocationModel? _locationModel;
 
@@ -20,17 +22,29 @@ public class LocationView : AView
 		_locationModel = locationModel;
 	}
 
-	public override async Task Loop()
+	public override IRenderable? Before()
 	{
 		var location = _locationModel?.CurrentLocation;
 		if (location == null)
 		{
 			DebugLog.Error("LocationView - Current location is null");
-			return;
+			return null;
 		}
 
-		await new MenuBuilder()
-			.Title(location.Description)
+		return new Rule($"[blue]{location.Name}[/]")
+		{
+			Justification = Justify.Center
+		};
+
+	}
+
+	public override async Task Loop()
+	{
+		await ViewUtils.RenderTextAsync("A desolate inn at the end of the world. It seems deserted, but you feels somethig in the air");
+
+		AnsiConsole.WriteLine();
+		new MenuBuilder()
+			.Title("What do you want to do?")
 			.AddOption(new BasicMenuOption("Navigate", OnNavigateSelected))
 			.AddOption(new BasicMenuOption("Search", OnSearchSelected))
 			.AddOption(new BasicMenuOption("Options", OnOptionsSelected))
@@ -57,6 +71,6 @@ public class LocationView : AView
 
 	public override void CleanUp()
 	{
-		// TODO: Remove listener
+		Ctx.ModelGetter.UnNotify<ILocationModel>(OnLocationModelUpdated);
 	}
 }

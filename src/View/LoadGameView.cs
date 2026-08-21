@@ -12,7 +12,7 @@ public class LoadGameView : AView
 	{
 		var options = Ctx.SaveManager.Profiles.Select(p => new SaveProfileOption(p)).Cast<IMenuOption>().ToArray();
 
-		await new MenuBuilder()
+		new MenuBuilder()
 			.Title("Select a save profile")
 			.AddOptions(options)
 			.HasBackOption()

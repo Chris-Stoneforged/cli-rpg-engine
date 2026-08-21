@@ -8,7 +8,7 @@ public class CreditsView : AView
 
 	public override async Task Loop()
 	{
-		await new MenuBuilder()
+		new MenuBuilder()
 			.Title("Created by Stoneforged Games")
 			.HasBackOption()
 			.Execute(Ctx);

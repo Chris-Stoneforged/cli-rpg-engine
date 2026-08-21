@@ -82,7 +82,7 @@ public class GameInstance
 	void EnterGame()
 	{
 		_viewManager.ResetStack();
-		_viewManager.ShowView(new LocationView());
+		_viewManager.ShowView(new WorldView());
 	}
 
 	void HandleQuitGameRequest(QuitGameRequest request)

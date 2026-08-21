@@ -65,4 +65,9 @@ public class ModelManager : IModelGetter, IModelUpdater
 			}
 		}
 	}
+
+	void IModelGetter.UnNotify<TModel>(Action<TModel> callback)
+	{
+		_callbacks.Remove(callback);
+	}
 }

@@ -3,6 +3,7 @@ using Models.Definitions;
 using Requests.Definitions;
 using Save.Definitions;
 using Spectre.Console;
+using Spectre.Console.Rendering;
 using View.Definitions;
 
 namespace View;
@@ -42,7 +43,15 @@ public class ViewManager() : IViewManager
 	public async Task Show()
 	{
 		AnsiConsole.Clear();
-		ShowDebugLogs();
+		AnsiConsole.Write(RenderDebugLogs());
+		foreach (var view in _viewStack.Reverse())
+		{
+			var renderable = view.Before();
+			if (renderable != null)
+			{
+				AnsiConsole.Write(renderable);
+			}
+		}
 
 		if (_viewStack.TryPeek(out var currentView))
 		{
@@ -88,7 +97,7 @@ public class ViewManager() : IViewManager
 			);
 	}
 
-	private void ShowDebugLogs()
+	private Renderable RenderDebugLogs()
 	{
 #if DEBUG
 		var debugGrid = new Grid()
@@ -108,7 +117,7 @@ public class ViewManager() : IViewManager
 		}
 
 		var debugPanel = new Panel(debugGrid).Header("Debug Logs", Justify.Center).Expand();
-		AnsiConsole.Write(debugPanel);
+		return debugPanel;
 #endif
 	}
 }

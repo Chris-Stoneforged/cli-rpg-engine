@@ -57,7 +57,7 @@ public class MenuBuilder
 		return this;
 	}
 
-	public async Task Execute(ViewContext ctx)
+	public void Execute(ViewContext ctx)
 	{
 		if (_hasBackOption)
 		{
@@ -72,7 +72,6 @@ public class MenuBuilder
 			}
 		}
 
-		// TODO: write the title async
 		_prompt
 			.Title(_title)
 			.AddChoices(_menuOptions);

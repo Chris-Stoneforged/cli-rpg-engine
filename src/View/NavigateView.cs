@@ -2,6 +2,7 @@ using Requests;
 using Resources.Definitions.Entities;
 using View.Menu.Options;
 using View.Menu;
+using Spectre.Console;
 
 namespace View;
 
@@ -20,7 +21,7 @@ public class NavigateView(Location fromLocation) : AView
 			)
 		).ToArray();
 
-		await new MenuBuilder()
+		new MenuBuilder()
 			.Title("Where do you want to go?")
 			.HasBackOption()
 			.AddOptions(options)

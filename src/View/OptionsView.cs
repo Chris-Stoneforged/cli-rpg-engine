@@ -10,7 +10,7 @@ public class OptionsView : AView
 
 	public override async Task Loop()
 	{
-		await new MenuBuilder()
+		new MenuBuilder()
 			.Title("Options")
 			.HasBackOption()
 			.AddOption(new BasicMenuOption("Save Game", OnSaveGameSelected))
