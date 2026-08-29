@@ -40,8 +40,7 @@ public class WorldView : AView
 
 	public override async Task Loop()
 	{
-		await ViewUtils.RenderTextAsync("A desolate inn at the end of the world. It seems deserted, but you feels somethig in the air");
-
+		//await ViewUtils.RenderTextAsync("A desolate inn at the end of the world. It seems deserted, but you feels somethig in the air");
 		AnsiConsole.WriteLine();
 		new MenuBuilder()
 			.Title("What do you want to do?")

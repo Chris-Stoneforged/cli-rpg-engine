@@ -45,3 +45,8 @@ builds/
 # Temporary files
 *.bak
 *.orig
+
+*-shm
+*-wal
+
+saves/
