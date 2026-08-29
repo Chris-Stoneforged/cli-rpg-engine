@@ -1,7 +1,6 @@
 using Models;
 using Models.Definitions;
 using Requests;
-using Resources.Definitions.Entities;
 using Save;
 
 namespace Controllers;
@@ -21,12 +20,15 @@ public class LocationController
 
 	private void HandleOpenDoorRequest(OpenDoorRequest request)
 	{
+
 		var locationModel = _ctx.ModelGetter.GetModel<ILocationModel>();
 		if (locationModel == null) return;
 
 		if (request.LocationId != locationModel.CurrentLocation?.Id) return;
 
-		var newLocation = _ctx.EntityLoader.LoadEntity<Location>(request.DestinationId);
+		using var db = _ctx.DataFactory.GetCampaignData();
+
+		var newLocation = db.Locations.SingleOrDefault(l => l.Id == request.DestinationId);
 		if (newLocation == null) return;
 
 		_ctx.ModelUpdater.UpdateModel<LocationModel>(
@@ -37,12 +39,14 @@ public class LocationController
 	#region SAVE_AND_LOAD
 	private void OnLocationDataLoaded(LocationSaveData saveData)
 	{
-		var location = _ctx.EntityLoader.LoadEntity<Location>(saveData.CurrentLocationId);
+		using var db = _ctx.DataFactory.GetCampaignData();
+
+		var location = db.Locations.SingleOrDefault(l => l.Id == saveData.CurrentLocationId);
 		if (location == null) return;
 
 		_ctx.ModelUpdater.UpdateModel<LocationModel>(
-			m => m.CurrentLocation = location
-		);
+				m => m.CurrentLocation = location
+				);
 	}
 
 	private LocationSaveData? GetLocationSaveData()

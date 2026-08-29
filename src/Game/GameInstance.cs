@@ -3,8 +3,8 @@ using Events;
 using Models;
 using Requests;
 using View;
-using Resources;
 using Save;
+using Data;
 
 namespace Game;
 
@@ -15,20 +15,18 @@ public class GameInstance
 	private readonly EventManager _eventManager;
 	private readonly ModelManager _modelManager;
 	private readonly SaveManager _saveManager;
+	private readonly ContextFactory _contextFactory;
 
 	private readonly LocationController _locationController;
 
-	private GameInstance(
-		ResourceManager resourceManager,
-		ViewManager viewManager
-	)
+	public GameInstance(string campaignPath)
 	{
 		_modelManager = ModelManager.Create();
 		_eventManager = new EventManager();
 		_requestManager = new RequestManager();
 		_saveManager = new SaveManager();
-		_viewManager = viewManager;
-		_viewManager.Initialize(_requestManager, _modelManager, _saveManager);
+		_contextFactory = new ContextFactory(campaignPath);
+		_viewManager = new ViewManager(_requestManager, _modelManager, _saveManager);
 
 		var controllerContext = new ControllerContext(
 			_modelManager,
@@ -36,7 +34,7 @@ public class GameInstance
 			_requestManager,
 			_eventManager,
 			_eventManager,
-			resourceManager,
+			_contextFactory,
 			_saveManager
 		);
 
@@ -52,18 +50,6 @@ public class GameInstance
 	}
 
 	private bool _gameRunning = true;
-
-	public static async Task<GameInstance?> Create(string campaignPath)
-	{
-		var resourceManager = new ResourceManager();
-		var viewManager = new ViewManager();
-
-		return !await viewManager.ShowLoad(
-			resourceManager.LoadCampaign(campaignPath)
-		) ?
-			null :
-			new GameInstance(resourceManager, viewManager);
-	}
 
 	public async Task Run()
 	{

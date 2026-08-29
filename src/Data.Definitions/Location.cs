@@ -1,12 +1,12 @@
 using Newtonsoft.Json;
 
-namespace Resources.Definitions.Entities;
+namespace Data.Definitions;
 
 [JsonObject(MemberSerialization.OptIn)]
 public class Location : Entity
 {
 	[JsonProperty("name")]
-	public string Name = "";
+	public string Name { get; set; } = "";
 	[JsonProperty("doors")]
-	public Door[] Doors = [];
+	public List<Door> Doors { get; set; } = [];
 }

@@ -1,5 +1,5 @@
+using Data.Definitions;
 using Models.Definitions;
-using Resources.Definitions.Entities;
 
 namespace Models;
 

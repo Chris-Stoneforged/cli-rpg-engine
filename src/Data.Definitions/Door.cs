@@ -1,12 +1,12 @@
 using Newtonsoft.Json;
 
-namespace Resources.Definitions.Entities;
+namespace Data.Definitions;
 
 [JsonObject(MemberSerialization.OptIn)]
 public class Door : Entity
 {
 	[JsonProperty("destination_id")]
-	public string DestinationId = "";
+	public string DestinationId { get; set; } = "";
 	[JsonProperty("call_to_action")]
-	public string CallToAction = "";
+	public string CallToAction { get; set; } = "";
 }

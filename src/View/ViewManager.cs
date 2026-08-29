@@ -8,23 +8,23 @@ using View.Definitions;
 
 namespace View;
 
-public class ViewManager() : IViewManager
+public class ViewManager(
+	IRequestDispatcher requestDispatcher,
+	IModelGetter modelGetter,
+	ISaveManager saveManager
+) : IViewManager
 {
 	private readonly Stack<IView> _viewStack = new();
 	private ViewContext? _viewContext = null;
 
-	public void Initialize(
-		IRequestDispatcher requestDispatcher,
-		IModelGetter modelGetter,
-		ISaveManager saveManager
-	)
-	{
-		_viewContext = new(this, requestDispatcher, modelGetter, saveManager);
-	}
+	private readonly IRequestDispatcher _requestDispatcher = requestDispatcher;
+	private readonly IModelGetter _modelGetter = modelGetter;
+	private readonly ISaveManager _saveManager = saveManager;
 
 	public void ShowView(IView view)
 	{
-		if (view is AView aView && _viewContext != null)
+		_viewContext ??= new ViewContext(this, _requestDispatcher, _modelGetter, _saveManager);
+		if (view is AView aView)
 		{
 			aView.Initialize(_viewContext);
 		}

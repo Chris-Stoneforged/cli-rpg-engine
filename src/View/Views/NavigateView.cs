@@ -1,8 +1,8 @@
 using Requests;
-using Resources.Definitions.Entities;
 using View.Menu.Options;
 using View.Menu;
 using Spectre.Console;
+using Data.Definitions;
 
 namespace View;
 

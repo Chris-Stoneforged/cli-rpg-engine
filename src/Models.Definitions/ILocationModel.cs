@@ -1,4 +1,4 @@
-using Resources.Definitions.Entities;
+using Data.Definitions;
 
 namespace Models.Definitions;
 

@@ -1,7 +1,7 @@
+using Data.Definitions;
 using Events.Definitions;
 using Models.Definitions;
 using Requests.Definitions;
-using Resources.Definitions;
 using Save.Definitions;
 
 namespace Controllers;
@@ -16,7 +16,7 @@ public class ControllerContext(
 	IRequestListener requestListener,
 	IEventDispatcher eventDispatcher,
 	IEventListener eventListener,
-	IEntityLoader entityLoader,
+	IDataFactory dataFactory,
 	ISaveManager saveSystem
 )
 {
@@ -25,6 +25,6 @@ public class ControllerContext(
 	public IRequestListener RequestListener { get; } = requestListener;
 	public IEventDispatcher EventDispatcher { get; } = eventDispatcher;
 	public IEventListener EventListener { get; } = eventListener;
-	public IEntityLoader EntityLoader { get; } = entityLoader;
+	public IDataFactory DataFactory { get; } = dataFactory;
 	public ISaveManager SaveSystem { get; } = saveSystem;
 }

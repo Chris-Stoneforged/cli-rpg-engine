@@ -6,11 +6,6 @@
 			"id": "0000",
 			"destination_id": "0001",
 			"call_to_action": "Take the stairs"
-		},
-		{
-			"id": "0001",
-			"destination_id": "0001",
-			"call_to_action": "Try the back door"
 		}
 	]
 }

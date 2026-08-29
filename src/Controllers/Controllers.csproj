@@ -7,11 +7,15 @@
     <ProjectReference Include="..\Requests.Definitions\Requests.Definitions.csproj" />
     <ProjectReference Include="..\Events\Events.csproj" />
     <ProjectReference Include="..\Events.Definitions\Events.Definitions.csproj" />
-    <ProjectReference Include="..\Resources.Definitions\Resources.Definitions.csproj" />
     <ProjectReference Include="..\View\View.csproj" />
     <ProjectReference Include="..\Debug\Debug.csproj" />
     <ProjectReference Include="..\Save.Definitions\Save.Definitions.csproj" />
     <ProjectReference Include="..\Save\Save.csproj" />
+    <ProjectReference Include="..\Data.Definitions\Data.Definitions.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="10.0.11" />
   </ItemGroup>
 
   <PropertyGroup>

@@ -15,5 +15,5 @@ public class ViewContext(
 	public readonly IModelGetter ModelGetter = modelGetter;
 	public readonly IViewManager ViewManager = viewManager;
 	public readonly IRequestDispatcher RequestDispatcher = requestDispatcher;
-	public readonly ISaveManager SaveManager = saveManager;
+	public readonly ISaveManager SaveManager = saveManager; // TODO: Find a way to remove this
 }
