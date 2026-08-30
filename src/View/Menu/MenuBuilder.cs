@@ -1,16 +1,17 @@
 using Spectre.Console;
 using View.Definitions;
-using View.Menu.Options;
+using View.Menu.Displays;
 
 namespace View.Menu;
 
 public class MenuBuilder
 {
-	private readonly SelectionPrompt<IMenuOption> _prompt =
-		new SelectionPrompt<IMenuOption>()
-			.UseConverter(o => o.CallToAction)
+	private readonly SelectionPrompt<MenuOption> _prompt =
+		new SelectionPrompt<MenuOption>()
+			.UseConverter(o => o.Display.DisplayMarkup)
 			.WrapAround();
-	private readonly List<IMenuOption> _menuOptions = [];
+
+	private readonly List<MenuOption> _menuOptions = [];
 
 	private string _title = "";
 	private bool _hasBackOption = false;
@@ -21,28 +22,43 @@ public class MenuBuilder
 		return this;
 	}
 
-	public MenuBuilder AddOption(IMenuOption option)
+	public MenuBuilder AddOption(IMenuOptionDisplay display, Action callback)
 	{
-		_menuOptions.Add(option);
+		_menuOptions.Add(new MenuOption(display, callback));
 		return this;
 	}
 
-	public MenuBuilder AddOptionIf(Func<bool> condition, IMenuOption option)
+	public MenuBuilder AddOptionIf(Func<bool> condition, IMenuOptionDisplay display, Action callback)
 	{
 		if (condition())
 		{
-			_menuOptions.Add(option);
+			_menuOptions.Add(new MenuOption(display, callback));
 		}
 		return this;
 	}
 
-	public MenuBuilder AddOptions(params IMenuOption[] options)
+	public MenuBuilder AddOption(string text, Action callback)
+	{
+		_menuOptions.Add(new MenuOption(text, callback));
+		return this;
+	}
+
+	public MenuBuilder AddOptionIf(Func<bool> condition, string text, Action callback)
+	{
+		if (condition())
+		{
+			_menuOptions.Add(new MenuOption(text, callback));
+		}
+		return this;
+	}
+
+	public MenuBuilder AddOptions(params MenuOption[] options)
 	{
 		_menuOptions.AddRange(options);
 		return this;
 	}
 
-	public MenuBuilder AddOptionsIf(Func<bool> condition, params IMenuOption[] options)
+	public MenuBuilder AddOptionsIf(Func<bool> condition, params MenuOption[] options)
 	{
 		if (condition())
 		{
@@ -61,15 +77,7 @@ public class MenuBuilder
 	{
 		if (_hasBackOption)
 		{
-			AddOption(new BackOption());
-		}
-
-		foreach (var option in _menuOptions)
-		{
-			if (option is AMenuOption aOption)
-			{
-				aOption.Initialize(ctx);
-			}
+			AddOption(new BackDisplay(), ctx.ViewManager.Back);
 		}
 
 		_prompt

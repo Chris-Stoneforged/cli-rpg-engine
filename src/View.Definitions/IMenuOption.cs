@@ -1,7 +1,6 @@
 namespace View.Definitions;
 
-public interface IMenuOption
+public interface IMenuOptionDisplay
 {
-	string CallToAction { get; }
-	Action Callback { get; }
+	string DisplayMarkup { get; }
 }

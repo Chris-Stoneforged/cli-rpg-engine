@@ -11,7 +11,8 @@ public class ModelManager : IModelGetter, IModelUpdater
 	public static ModelManager Create()
 	{
 		return new ModelManager()
-			.RegisterModel<LocationModel>();
+			.RegisterModel<LocationModel>()
+			.RegisterModel<InventoryModel>();
 	}
 
 	public ModelManager RegisterModel<TModel>() where TModel : class, IModel, new()

@@ -1,8 +1,7 @@
 using Requests;
 using View.Menu;
-using View.Menu.Options;
 
-namespace View;
+namespace View.Views;
 
 public class MainMenuView : AView
 {
@@ -10,13 +9,13 @@ public class MainMenuView : AView
 	{
 		new MenuBuilder()
 			.Title("Welcome to the game")
-			.AddOption(new BasicMenuOption("New Game", OnNewGameSelected))
+			.AddOption("New Game", OnNewGameSelected)
 			.AddOptionIf(
-					() => Ctx.SaveManager.Profiles.Count > 0,
-					new BasicMenuOption("Load Game", OnLoadGameSelected)
-					)
-			.AddOption(new BasicMenuOption("Credits", OnCreditsSelected))
-			.AddOption(new BasicMenuOption("Quit", OnQuitSelected))
+				() => Ctx.SaveManager.Profiles.Count > 0,
+				"Load Game",
+				OnLoadGameSelected
+			)
+			.AddOption("Quit", OnQuitSelected)
 			.Execute(Ctx);
 	}
 
@@ -30,11 +29,6 @@ public class MainMenuView : AView
 	private void OnLoadGameSelected()
 	{
 		Ctx.ViewManager.ShowView(new LoadGameView());
-	}
-
-	private void OnCreditsSelected()
-	{
-		Ctx.ViewManager.ShowView(new CreditsView());
 	}
 
 	private void OnQuitSelected()

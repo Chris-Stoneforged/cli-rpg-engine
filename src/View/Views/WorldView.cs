@@ -3,9 +3,8 @@ using Models.Definitions;
 using Spectre.Console;
 using Spectre.Console.Rendering;
 using View.Menu;
-using View.Menu.Options;
 
-namespace View;
+namespace View.Views;
 
 public class WorldView : AView
 {
@@ -44,9 +43,10 @@ public class WorldView : AView
 		AnsiConsole.WriteLine();
 		new MenuBuilder()
 			.Title("What do you want to do?")
-			.AddOption(new BasicMenuOption("Navigate", OnNavigateSelected))
-			.AddOption(new BasicMenuOption("Search", OnSearchSelected))
-			.AddOption(new BasicMenuOption("Options", OnOptionsSelected))
+			.AddOption("Navigate", OnNavigateSelected)
+			.AddOption("Search", OnSearchSelected)
+			.AddOption("Inventory", OnInventorySelected)
+			.AddOption("Options", OnOptionsSelected)
 			.Execute(Ctx);
 	}
 
@@ -58,9 +58,17 @@ public class WorldView : AView
 		}
 	}
 
-	private static void OnSearchSelected()
+	private void OnSearchSelected()
 	{
+		if (_locationModel != null && _locationModel.CurrentLocation != null)
+		{
+			Ctx.ViewManager.ShowView(new SearchView(_locationModel.CurrentLocation));
+		}
+	}
 
+	private void OnInventorySelected()
+	{
+		Ctx.ViewManager.ShowView(new InventoryView());
 	}
 
 	private void OnOptionsSelected()

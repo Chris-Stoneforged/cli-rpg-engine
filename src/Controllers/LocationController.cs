@@ -7,15 +7,11 @@ using Save;
 
 namespace Controllers;
 
-public class LocationController
+public class LocationController : AController
 {
-	private readonly ControllerContext _ctx;
-
-	public LocationController(ControllerContext context)
+	public LocationController(ControllerContext ctx) : base(ctx)
 	{
-		_ctx = context;
 		_ctx.RequestListener.RegisterHandler<OpenDoorRequest>(HandleOpenDoorRequest);
-
 		_ctx.SaveSystem.RegisterLoadHandler<LocationSaveData>("location", OnLocationDataLoaded);
 		_ctx.SaveSystem.RegisterSaveHandler("location", GetLocationSaveData);
 	}
@@ -26,26 +22,14 @@ public class LocationController
 		var locationModel = _ctx.ModelGetter.GetModel<ILocationModel>();
 		if (locationModel == null) return;
 
-		if (request.LocationId != locationModel.CurrentLocation?.Id)
+		if (request.Door.FromId != locationModel.CurrentLocation?.Id)
 		{
 			DebugLog.Error("Attempting to use door that is not in the current location");
 			return;
 		}
 
-		using var db = _ctx.DataFactory.GetCampaignData();
-
-		var newLocation = db.Locations
-			.Include(l => l.Doors)
-			.SingleOrDefault(l => l.Id == request.DestinationId);
-
-		if (newLocation == null)
-		{
-			DebugLog.Error("Attempting to use door that leads to non-existent location");
-			return;
-		}
-
 		_ctx.ModelUpdater.UpdateModel<LocationModel>(
-			l => l.CurrentLocation = newLocation
+			l => l.CurrentLocation = request.Door.To
 		);
 	}
 
@@ -55,9 +39,12 @@ public class LocationController
 		using var db = _ctx.DataFactory.GetCampaignData();
 
 		var location = db.Locations
-			.Include(l => l.Doors)
-			.SingleOrDefault(l => l.Id == saveData.CurrentLocationId)
-			;
+			.Include(l => l.ItemPickups)
+			.ThenInclude(p => p.Item)
+			.Include(l => l.DoorsOut)
+			.ThenInclude(d => d.To)
+			.SingleOrDefault(l => l.Id == saveData.CurrentLocationId);
+
 		if (location == null)
 		{
 			DebugLog.Error("Could not load current location - ID is invalid");
@@ -72,9 +59,12 @@ public class LocationController
 	private LocationSaveData? GetLocationSaveData()
 	{
 		var locationModel = _ctx.ModelGetter.GetModel<ILocationModel>();
-		if (locationModel == null) return null;
-
-		return new LocationSaveData() { CurrentLocationId = locationModel.CurrentLocation?.Id ?? "" };
+		return locationModel == null ?
+			null :
+			new LocationSaveData()
+			{
+				CurrentLocationId = locationModel.CurrentLocation?.Id ?? 1
+			};
 	}
 	#endregion
 }

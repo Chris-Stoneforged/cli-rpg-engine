@@ -1,10 +1,9 @@
 using Requests;
-using View.Menu.Options;
 using View.Menu;
 using Spectre.Console;
-using Data.Definitions;
+using Data.Definitions.Entities;
 
-namespace View;
+namespace View.Views;
 
 public class NavigateView(Location fromLocation) : AView
 {
@@ -14,10 +13,10 @@ public class NavigateView(Location fromLocation) : AView
 
 	public override async Task Loop()
 	{
-		var options = _fromLocation.Doors.Select(
-			d => new BasicMenuOption(
+		var options = _fromLocation.DoorsOut.Select(
+			d => new MenuOption(
 				d.CallToAction,
-				() => OnLocationSelected(d.DestinationId, d.Id)
+				() => OnLocationSelected(d)
 			)
 		).ToArray();
 
@@ -28,11 +27,9 @@ public class NavigateView(Location fromLocation) : AView
 			.Execute(Ctx);
 	}
 
-	private void OnLocationSelected(string destinationId, string doorId)
+	private void OnLocationSelected(Door door)
 	{
 		Ctx.ViewManager.Back();
-		Ctx.RequestDispatcher.MakeRequest(
-			new OpenDoorRequest(_fromLocation.Id, destinationId, doorId)
-		);
+		Ctx.RequestDispatcher.MakeRequest(new OpenDoorRequest(door));
 	}
 }

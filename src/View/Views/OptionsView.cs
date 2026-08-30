@@ -1,8 +1,7 @@
 using Requests;
 using View.Menu;
-using View.Menu.Options;
 
-namespace View;
+namespace View.Views;
 
 public class OptionsView : AView
 {
@@ -13,9 +12,9 @@ public class OptionsView : AView
 		new MenuBuilder()
 			.Title("Options")
 			.HasBackOption()
-			.AddOption(new BasicMenuOption("Save Game", OnSaveGameSelected))
-			.AddOption(new BasicMenuOption("Load Game", OnLoadGameSelected))
-			.AddOption(new BasicMenuOption("Main Menu", OnMainMenuSelected))
+			.AddOption("Save Game", OnSaveGameSelected)
+			.AddOption("Load Game", OnLoadGameSelected)
+			.AddOption("Main Menu", OnMainMenuSelected)
 			.Execute(Ctx);
 	}
 

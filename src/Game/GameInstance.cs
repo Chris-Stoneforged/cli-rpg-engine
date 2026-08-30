@@ -5,6 +5,7 @@ using Requests;
 using View;
 using Save;
 using Data;
+using View.Views;
 
 namespace Game;
 
@@ -18,6 +19,7 @@ public class GameInstance
 	private readonly ContextFactory _contextFactory;
 
 	private readonly LocationController _locationController;
+	private readonly InventoryController _inventoryController;
 
 	public GameInstance(string campaignPath)
 	{
@@ -28,7 +30,7 @@ public class GameInstance
 		_contextFactory = new ContextFactory(campaignPath);
 		_viewManager = new ViewManager(_requestManager, _modelManager, _saveManager);
 
-		var controllerContext = new ControllerContext(
+		var ctx = new ControllerContext(
 			_modelManager,
 			_modelManager,
 			_requestManager,
@@ -38,7 +40,8 @@ public class GameInstance
 			_saveManager
 		);
 
-		_locationController = new LocationController(controllerContext);
+		_locationController = new LocationController(ctx);
+		_inventoryController = new InventoryController(ctx);
 
 		_requestManager.RegisterHandler<QuitGameRequest>(HandleQuitGameRequest);
 		_requestManager.RegisterHandler<NewGameRequest>(HandleCreateSaveRequest);
