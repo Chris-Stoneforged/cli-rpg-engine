@@ -1,4 +1,5 @@
 using Requests;
+using View.Definitions;
 using View.Menu;
 
 namespace View.Views;
@@ -30,5 +31,6 @@ public class OptionsView : AView
 
 	private void OnLoadGameSelected()
 	{
+		Ctx.ViewManager.ShowCachedView(ViewKey.LOAD_GAME);
 	}
 }

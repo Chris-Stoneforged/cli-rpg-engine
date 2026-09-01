@@ -1,4 +1,4 @@
-namespace Data.Definitions;
+namespace Core.Definitions.Enums;
 
 public enum ItemType
 {

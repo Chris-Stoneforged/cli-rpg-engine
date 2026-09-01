@@ -43,5 +43,13 @@ public class GameDatabase(string campaignPath) : DbContext, IGameDatabase
 			.HasOne(e => e.Item)
 			.WithMany(e => e.InventoryEntries)
 			.HasForeignKey(e => e.ItemId);
+		modelBuilder.Entity<InventoryEntry>()
+			.HasOne(e => e.Owner)
+			.WithMany(e => e.InventoryEntries)
+			.HasForeignKey(e => e.OwnerId);
+		modelBuilder.Entity<Character>()
+			.HasOne(e => e.Location)
+			.WithMany(e => e.Characters)
+			.HasForeignKey(e => e.LocationId);
 	}
 }

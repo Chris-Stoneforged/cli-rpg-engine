@@ -15,26 +15,20 @@ public class InventoryView() : AView
 	{
 		using var db = Ctx.SessionFactory.GetReadonlySession();
 
-		var header = "Inventory";
-		MenuOption[] options = [];
+		var core = db.Core
+			.Include(c => c.PlayerCharacter)
+			.ThenInclude(c => c.InventoryEntries)
+			.ThenInclude(e => e.Item)
+			.FirstOrDefault();
 
-		if (db.InventoryEntries.Count() == 0)
-		{
-			header += " (Empty)";
-		}
-		else
-		{
-			options = db.InventoryEntries
-				.Include(e => e.Item)
-				.AsEnumerable()
-				.Select(p => new MenuOption(
-					new InventoryEntryDisplay(p),
-					() => OnInventoryItemSelected(p)))
-				.ToArray();
-		}
+		var options = core?.PlayerCharacter?.InventoryEntries
+			.Select(p => new MenuOption(
+				new InventoryEntryDisplay(p),
+				() => OnInventoryItemSelected(p)))
+			.ToArray() ?? [];
 
 		new MenuBuilder()
-			.Title(header)
+			.Title(options.Length == 0 ? "Inventory (Empty)" : "Inventory")
 			.HasBackOption()
 			.AddOptions(options)
 			.Execute(Ctx);

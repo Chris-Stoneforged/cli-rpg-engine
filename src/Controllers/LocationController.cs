@@ -31,22 +31,9 @@ public class LocationController
 			return;
 		}
 
-		var core = db.Core.Include(c => c.CurrentLocation).FirstOrDefault();
-		if (core == null)
+		if (door.From == null)
 		{
-			DebugLog.Error("Could not get core");
-			return;
-		}
-
-		if (core.CurrentLocation == null)
-		{
-			DebugLog.Error("Could not get current location");
-			return;
-		}
-
-		if (door.From != core.CurrentLocation)
-		{
-			DebugLog.Error("Attempting to use door that is not in the current location");
+			DebugLog.Error($"Door with Id {door.Id} does not have a From location");
 			return;
 		}
 
@@ -56,7 +43,24 @@ public class LocationController
 			return;
 		}
 
-		core.CurrentLocation = door.To;
+		var core = db.Core
+			.Include(c => c.PlayerCharacter)
+			.ThenInclude(c => c.Location)
+			.FirstOrDefault();
+		if (core == null)
+		{
+			DebugLog.Error("Could not get core");
+			return;
+		}
+
+		if (door.From != core.PlayerCharacter?.Location)
+		{
+			DebugLog.Error("Attempting to use door that is not in the current location");
+			return;
+		}
+
+
+		core.PlayerCharacter.Location = door.To;
 		db.SaveChanges();
 	}
 }

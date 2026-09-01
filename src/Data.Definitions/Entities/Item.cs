@@ -1,3 +1,4 @@
+using Core.Definitions.Enums;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
 
@@ -13,6 +14,6 @@ public class Item : Entity
 	[JsonProperty("type"), JsonConverter(typeof(StringEnumConverter))]
 	public ItemType Type { get; set; } = ItemType.REGULAR;
 
-	public List<ItemPickup> ItemPickups { get; set; } = [];
-	public List<InventoryEntry> InventoryEntries { get; set; } = [];
+	public ICollection<ItemPickup> ItemPickups { get; set; } = [];
+	public ICollection<InventoryEntry> InventoryEntries { get; set; } = [];
 }

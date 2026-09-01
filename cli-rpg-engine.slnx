@@ -1,6 +1,7 @@
 <Solution>
   <Folder Name="/src/">
     <Project Path="src/Controllers/Controllers.csproj" />
+    <Project Path="src/Core.Definitions/Core.Definitions.csproj" />
     <Project Path="src/Data.Definitions/Data.Definitions.csproj" />
     <Project Path="src/Data/Data.csproj" />
     <Project Path="src/Debug/Debug.csproj" />

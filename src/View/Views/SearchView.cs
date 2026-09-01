@@ -16,24 +16,20 @@ public class SearchView : AView
 		var db = Ctx.SessionFactory.GetReadonlySession();
 
 		var core = db.Core
-			.Include(c => c.CurrentLocation)
+			.Include(c => c.PlayerCharacter)
+			.ThenInclude(c => c.Location)
 			.ThenInclude(l => l.ItemPickups)
 			.ThenInclude(i => i.Item)
 			.FirstOrDefault();
 
-		if (core == null || core.CurrentLocation == null)
-		{
-			return;
-		}
-
-		var options = core.CurrentLocation.ItemPickups
+		var options = core?.PlayerCharacter?.Location?.ItemPickups
 			.Select(p => new MenuOption(
 				new ItemPickupDisplay(p),
 				() => OnItemPickedUp(p)))
-			.ToArray();
+			.ToArray() ?? [];
 
 		new MenuBuilder()
-			.Title("You find these items")
+			.Title(options.Length == 0 ? "You find nothing of interest" : "You find these items")
 			.HasBackOption()
 			.AddOptions(options)
 			.Execute(Ctx);

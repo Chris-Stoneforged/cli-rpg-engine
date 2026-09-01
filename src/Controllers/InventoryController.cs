@@ -33,31 +33,40 @@ public class InventoryController
 			return;
 		}
 
+		if (pickup.Location == null)
+		{
+			DebugLog.Error($"ItemPickup with Id {pickup.Id} has no location");
+			return;
+		}
+
 		if (request.Amount > pickup.Quantity)
 		{
 			DebugLog.Error("Trying to pick up more of an item than is available");
 			return;
 		}
 
-		var currentLocation = db.Core.FirstOrDefault()?.CurrentLocation;
-		if (currentLocation == null)
+		var core = db.Core
+			.Include(c => c.PlayerCharacter)
+			.ThenInclude(c => c.Location)
+			.FirstOrDefault();
+		if (core == null)
 		{
-			DebugLog.Error("Could not get current location");
+			DebugLog.Error("Could not get core");
 			return;
 		}
 
-		if (pickup.Location != currentLocation)
+		if (pickup.Location != core.PlayerCharacter?.Location)
 		{
 			DebugLog.Error("Trying to pick up item that is not in the current location");
 			return;
 		}
 
-		var existingEntry = db.InventoryEntries
+		var existingEntry = core.PlayerCharacter.InventoryEntries
 			.FirstOrDefault(e => e.ItemId == pickup.ItemId);
 		if (existingEntry == null)
 		{
 			DebugLog.Info("Item does not exist in inventory. Adding new entry");
-			db.InventoryEntries.Add(
+			core.PlayerCharacter.InventoryEntries.Add(
 				new InventoryEntry()
 				{
 					Item = pickup.Item,
@@ -72,7 +81,7 @@ public class InventoryController
 
 		if (request.Amount == pickup.Quantity)
 		{
-			currentLocation.ItemPickups.Remove(pickup);
+			pickup.Location.ItemPickups.Remove(pickup);
 		}
 		else
 		{

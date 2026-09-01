@@ -9,18 +9,17 @@ public class WorldView : AView
 {
 	public override IRenderable? Before()
 	{
-		var locationName = "";
+		using var db = Ctx.SessionFactory.GetReadonlySession();
+		var core = db.Core
+			.Include(c => c.PlayerCharacter)
+			.ThenInclude(c => c.Location)
+			.FirstOrDefault();
 
-		using (var db = Ctx.SessionFactory.GetReadonlySession())
-		{
-			var core = db.Core
-				.Include(c => c.CurrentLocation)
-				.FirstOrDefault();
-
-			locationName = core == null || core.CurrentLocation == null ?
+		var locationName = core == null ||
+			core.PlayerCharacter == null ||
+			core.PlayerCharacter.Location == null ?
 				"???" :
-				core.CurrentLocation.Name;
-		}
+				core.PlayerCharacter.Location.Name;
 
 		return new Rule($"[blue]{locationName}[/]")
 		{

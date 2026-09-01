@@ -8,7 +8,8 @@ public class Location : Entity
 	[JsonProperty("name")]
 	public string Name { get; set; } = "";
 
-	public List<Door> DoorsOut { get; set; } = [];
-	public List<Door> DoorsIn { get; set; } = [];
-	public List<ItemPickup> ItemPickups { get; set; } = [];
+	public ICollection<Door> DoorsOut { get; set; } = [];
+	public ICollection<Door> DoorsIn { get; set; } = [];
+	public ICollection<ItemPickup> ItemPickups { get; set; } = [];
+	public ICollection<Character> Characters { get; set; } = [];
 }

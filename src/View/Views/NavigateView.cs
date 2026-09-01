@@ -16,7 +16,8 @@ public class NavigateView : AView
 		var db = Ctx.SessionFactory.GetReadonlySession();
 
 		var core = db.Core
-			.Include(c => c.CurrentLocation)
+			.Include(c => c.PlayerCharacter)
+			.ThenInclude(c => c.Location)
 			.ThenInclude(l => l.DoorsOut)
 			.FirstOrDefault();
 
@@ -26,13 +27,19 @@ public class NavigateView : AView
 			return;
 		}
 
-		if (core.CurrentLocation == null)
+		if (core.PlayerCharacter == null)
 		{
-			DebugLog.Error("Current location does not exist");
+			DebugLog.Error("Could not get player character");
 			return;
 		}
 
-		var options = core.CurrentLocation.DoorsOut.Select(
+		if (core.PlayerCharacter.Location == null)
+		{
+			DebugLog.Error("Could not get player's location");
+			return;
+		}
+
+		var options = core.PlayerCharacter.Location.DoorsOut.Select(
 			d => new MenuOption(
 				d.CallToAction,
 				() => OnLocationSelected(d)

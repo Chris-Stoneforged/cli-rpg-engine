@@ -70,7 +70,12 @@ public class SaveManager
 			db.Core.Add(
 				new GameCore()
 				{
-					CurrentLocation = location
+					PlayerCharacter = new Character()
+					{
+						Name = "Character",
+						Location = location,
+						InventoryEntries = []
+					}
 				}
 			);
 
