@@ -4,12 +4,15 @@ using Data.Definitions.Entities;
 
 namespace Data;
 
-public class CampaignContext(string campaignPath) : DbContext, ICampaignData
+public class GameDatabase(string campaignPath) : DbContext, IGameDatabase
 {
+	public DbSet<GameCore> Core { get; set; }
+	public DbSet<SaveProfile> SaveProfile { get; set; }
 	public DbSet<Location> Locations { get; set; }
 	public DbSet<Door> Doors { get; set; }
 	public DbSet<Item> Items { get; set; }
 	public DbSet<ItemPickup> ItemPickups { get; set; }
+	public DbSet<InventoryEntry> InventoryEntries { get; set; }
 
 	private readonly string _campaignPath = campaignPath;
 
@@ -35,6 +38,10 @@ public class CampaignContext(string campaignPath) : DbContext, ICampaignData
 		modelBuilder.Entity<ItemPickup>()
 			.HasOne(e => e.Item)
 			.WithMany(e => e.ItemPickups)
+			.HasForeignKey(e => e.ItemId);
+		modelBuilder.Entity<InventoryEntry>()
+			.HasOne(e => e.Item)
+			.WithMany(e => e.InventoryEntries)
 			.HasForeignKey(e => e.ItemId);
 	}
 }

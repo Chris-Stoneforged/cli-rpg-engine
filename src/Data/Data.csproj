@@ -2,6 +2,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Data.Definitions\Data.Definitions.csproj" />
+    <ProjectReference Include="..\Debug\Debug.csproj" />
   </ItemGroup>
 
   <ItemGroup>

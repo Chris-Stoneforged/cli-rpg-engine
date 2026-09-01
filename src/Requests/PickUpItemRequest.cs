@@ -1,8 +1,7 @@
-using Data.Definitions.Entities;
-
 namespace Requests;
 
-public class PickUpItemRequest(ItemPickup itemPickup) : AGameRequest
+public class PickUpItemRequest(int pickupId, int amount) : AGameRequest
 {
-	public ItemPickup Pickup { get; } = itemPickup;
+	public int PickupId { get; } = pickupId;
+	public int Amount { get; } = amount;
 }

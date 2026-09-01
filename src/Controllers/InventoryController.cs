@@ -1,75 +1,84 @@
+using Data;
 using Data.Definitions.Entities;
 using Debug;
-using Models;
-using Models.Definitions;
+using Microsoft.EntityFrameworkCore;
 using Requests;
+using Requests.Definitions;
 
 namespace Controllers;
 
-public class InventoryController : AController
+public class InventoryController
 {
-	public InventoryController(ControllerContext ctx) : base(ctx)
+	private readonly SessionFactory _sessionFactory;
+
+	public InventoryController(IRequestListener listener, SessionFactory sessionFactory)
 	{
-		_ctx.RequestListener.RegisterHandler<PickUpItemRequest>(HandlePickUpItemRequest);
+		_sessionFactory = sessionFactory;
+		listener.RegisterHandler<PickUpItemRequest>(HandlePickUpItemRequest);
 	}
 
 	private void HandlePickUpItemRequest(PickUpItemRequest request)
 	{
-		var locationModel = _ctx.ModelGetter.GetModel<ILocationModel>();
-		if (locationModel == null)
+		using var db = _sessionFactory.GetSession();
+
+		var pickup = db.ItemPickups
+			.Include(p => p.Item)
+			.Include(p => p.Location)
+			.ThenInclude(l => l.ItemPickups)
+			.FirstOrDefault(p => p.Id == request.PickupId);
+
+		if (pickup == null)
 		{
-			DebugLog.Error("HandlePickUpItemRequest - could not get Location model");
+			DebugLog.Error($"ItemPickup with Id {request.PickupId} does not exist");
 			return;
 		}
 
-		if (request.Pickup.Location != locationModel.CurrentLocation)
+		if (request.Amount > pickup.Quantity)
+		{
+			DebugLog.Error("Trying to pick up more of an item than is available");
+			return;
+		}
+
+		var currentLocation = db.Core.FirstOrDefault()?.CurrentLocation;
+		if (currentLocation == null)
+		{
+			DebugLog.Error("Could not get current location");
+			return;
+		}
+
+		if (pickup.Location != currentLocation)
 		{
 			DebugLog.Error("Trying to pick up item that is not in the current location");
 			return;
 		}
 
-		_ctx.ModelUpdater.UpdateModel<InventoryModel>(
-			inventory => AddItemToInventory(inventory, request.Pickup.Item, request.Pickup.Quantity)
-		);
-	}
-
-	public void AddItemToInventory(InventoryModel inventory, Item item, int quantity = 1)
-	{
-		var existing = inventory.Items.FirstOrDefault(i => i.Item.Id == item.Id);
-		if (existing != null)
+		var existingEntry = db.InventoryEntries
+			.FirstOrDefault(e => e.ItemId == pickup.ItemId);
+		if (existingEntry == null)
 		{
-			existing.Quantity += quantity;
-			return;
+			DebugLog.Info("Item does not exist in inventory. Adding new entry");
+			db.InventoryEntries.Add(
+				new InventoryEntry()
+				{
+					Item = pickup.Item,
+					Quantity = request.Amount
+				});
+		}
+		else
+		{
+			DebugLog.Info("Item exists in inventory. Adding quantity");
+			existingEntry.Quantity += pickup.Quantity;
 		}
 
-		inventory.Items.Add(new InventoryItem()
+		if (request.Amount == pickup.Quantity)
 		{
-			Item = item,
-			Quantity = quantity
-		});
-	}
-
-	public void RemoveItemFromInventory(InventoryModel inventory, Item item, int quantity = 1)
-	{
-		var existing = inventory.Items.FirstOrDefault(i => i.Item.Id == item.Id);
-		if (existing == null)
+			currentLocation.ItemPickups.Remove(pickup);
+		}
+		else
 		{
-			DebugLog.Warn($"Trying to remove item {item.Id} that is not in inventory");
-			return;
+			pickup.Quantity -= request.Amount;
 		}
 
-		if (existing.Quantity < quantity)
-		{
-			DebugLog.Warn($"Trying to remove {quantity} of {item.Id}, but there are only {existing.Quantity} in inventory");
-			return;
-		}
-
-		if (existing.Quantity == quantity)
-		{
-			inventory.Items.Remove(existing);
-			return;
-		}
-
-		existing.Quantity -= quantity;
+		db.SaveChanges();
 	}
 }

@@ -1,6 +1,5 @@
-using Models.Definitions;
+using Data.Definitions;
 using Requests.Definitions;
-using Save.Definitions;
 using View.Definitions;
 
 namespace View;
@@ -8,12 +7,10 @@ namespace View;
 public class ViewContext(
 	IViewManager viewManager,
 	IRequestDispatcher requestDispatcher,
-	IModelGetter modelGetter,
-	ISaveManager saveManager
+	ISessionFactory sessionFactory
 )
 {
-	public readonly IModelGetter ModelGetter = modelGetter;
+	public readonly ISessionFactory SessionFactory = sessionFactory;
 	public readonly IViewManager ViewManager = viewManager;
 	public readonly IRequestDispatcher RequestDispatcher = requestDispatcher;
-	public readonly ISaveManager SaveManager = saveManager; // TODO: Find a way to remove this
 }

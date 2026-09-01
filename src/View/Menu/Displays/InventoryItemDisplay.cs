@@ -1,9 +1,9 @@
-using Models.Definitions;
+using Data.Definitions.Entities;
 using View.Definitions;
 
 namespace View.Menu.Displays;
 
-public class InventoryItemDisplay(IInventoryItem inventoryItem) : IMenuOptionDisplay
+public class InventoryEntryDisplay(InventoryEntry inventoryEntry) : IMenuOptionDisplay
 {
-	public string DisplayMarkup => $"{inventoryItem.Item.Name} - {inventoryItem.Quantity}";
+	public string DisplayMarkup => $"{inventoryEntry.Item?.Name} - {inventoryEntry.Quantity}";
 }

@@ -53,73 +53,73 @@ public class BuildCampaignCommand
 			return 1;
 		}
 
-		var code = 0;//await AnsiConsole.Status()
-					 //.Spinner(Spinner.Known.Dots)
-					 //.SpinnerStyle(Style.Parse("green"))
-					 //.StartAsync("Building campaign", async ctx =>
-					 //{
-					 // Create and clear database
-		var db = new CampaignContext(outputPath.ToString());
-		db.ChangeTracker.Entries().ToList().ForEach(e => e.State = EntityState.Detached);
-		await db.Database.EnsureDeletedAsync(token);
-		await db.Database.EnsureCreatedAsync(token);
-
-		var doorsPath = Path.Combine(campaignPath.ToString(), "doors");
-		foreach (var p in Directory.EnumerateFiles(doorsPath))
-		{
-			var contents = await File.ReadAllTextAsync(p);
-			var door = JsonConvert.DeserializeObject<Door>(contents);
-			if (door == null)
+		var code = await AnsiConsole.Status()
+			.Spinner(Spinner.Known.Dots)
+			.SpinnerStyle(Style.Parse("green"))
+			.StartAsync("Building campaign", async ctx =>
 			{
-				continue;
-			}
+				// Create and clear database
+				var db = new GameDatabase(outputPath.ToString());
+				db.ChangeTracker.Entries().ToList().ForEach(e => e.State = EntityState.Detached);
+				await db.Database.EnsureDeletedAsync(token);
+				await db.Database.EnsureCreatedAsync(token);
 
-			await db.Doors.AddAsync(door);
-		}
+				var doorsPath = Path.Combine(campaignPath.ToString(), "doors");
+				foreach (var p in Directory.EnumerateFiles(doorsPath))
+				{
+					var contents = await File.ReadAllTextAsync(p);
+					var door = JsonConvert.DeserializeObject<Door>(contents);
+					if (door == null)
+					{
+						continue;
+					}
 
-		var locationsPath = Path.Combine(campaignPath.ToString(), "locations");
-		foreach (var p in Directory.EnumerateFiles(locationsPath))
-		{
-			var contents = await File.ReadAllTextAsync(p);
-			var location = JsonConvert.DeserializeObject<Location>(contents);
-			if (location == null)
-			{
-				continue;
-			}
+					await db.Doors.AddAsync(door);
+				}
 
-			await db.Locations.AddAsync(location);
-		}
+				var locationsPath = Path.Combine(campaignPath.ToString(), "locations");
+				foreach (var p in Directory.EnumerateFiles(locationsPath))
+				{
+					var contents = await File.ReadAllTextAsync(p);
+					var location = JsonConvert.DeserializeObject<Location>(contents);
+					if (location == null)
+					{
+						continue;
+					}
 
-		var itemsPath = Path.Combine(campaignPath.ToString(), "items");
-		foreach (var p in Directory.EnumerateFiles(itemsPath))
-		{
-			var contents = await File.ReadAllTextAsync(p);
-			var item = JsonConvert.DeserializeObject<Item>(contents);
-			if (item == null)
-			{
-				continue;
-			}
+					await db.Locations.AddAsync(location);
+				}
 
-			await db.Items.AddAsync(item);
-		}
+				var itemsPath = Path.Combine(campaignPath.ToString(), "items");
+				foreach (var p in Directory.EnumerateFiles(itemsPath))
+				{
+					var contents = await File.ReadAllTextAsync(p);
+					var item = JsonConvert.DeserializeObject<Item>(contents);
+					if (item == null)
+					{
+						continue;
+					}
+
+					await db.Items.AddAsync(item);
+				}
 
 
-		var itemPickupsPath = Path.Combine(campaignPath.ToString(), "item-pickups");
-		foreach (var p in Directory.EnumerateFiles(itemPickupsPath))
-		{
-			var contents = await File.ReadAllTextAsync(p);
-			var itemPickup = JsonConvert.DeserializeObject<ItemPickup>(contents);
-			if (itemPickup == null)
-			{
-				continue;
-			}
+				var itemPickupsPath = Path.Combine(campaignPath.ToString(), "item-pickups");
+				foreach (var p in Directory.EnumerateFiles(itemPickupsPath))
+				{
+					var contents = await File.ReadAllTextAsync(p);
+					var itemPickup = JsonConvert.DeserializeObject<ItemPickup>(contents);
+					if (itemPickup == null)
+					{
+						continue;
+					}
 
-			await db.ItemPickups.AddAsync(itemPickup);
-		}
+					await db.ItemPickups.AddAsync(itemPickup);
+				}
 
-		await db.SaveChangesAsync();
-		return 0;
-		//});
+				await db.SaveChangesAsync();
+				return 0;
+			});
 
 		if (code == 0)
 		{

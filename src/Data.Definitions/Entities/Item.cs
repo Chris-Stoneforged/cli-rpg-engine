@@ -14,4 +14,5 @@ public class Item : Entity
 	public ItemType Type { get; set; } = ItemType.REGULAR;
 
 	public List<ItemPickup> ItemPickups { get; set; } = [];
+	public List<InventoryEntry> InventoryEntries { get; set; } = [];
 }

@@ -2,7 +2,6 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Requests.Definitions\Requests.Definitions.csproj" />
-    <ProjectReference Include="..\Models.Definitions\Models.Definitions.csproj" />
   </ItemGroup>
 
   <ItemGroup>

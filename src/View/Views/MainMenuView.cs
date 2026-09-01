@@ -1,17 +1,21 @@
+using Data.Definitions.Entities;
 using Requests;
+using View.Definitions;
 using View.Menu;
 
 namespace View.Views;
 
-public class MainMenuView : AView
+public class MainMenuView(IReadOnlyCollection<SaveProfile> saveProfiles) : AView
 {
+	private readonly IReadOnlyCollection<SaveProfile> _saveProfiles = saveProfiles;
+
 	public override async Task Loop()
 	{
 		new MenuBuilder()
 			.Title("Welcome to the game")
 			.AddOption("New Game", OnNewGameSelected)
 			.AddOptionIf(
-				() => Ctx.SaveManager.Profiles.Count > 0,
+				() => _saveProfiles.Count() > 0,
 				"Load Game",
 				OnLoadGameSelected
 			)
@@ -28,7 +32,7 @@ public class MainMenuView : AView
 
 	private void OnLoadGameSelected()
 	{
-		Ctx.ViewManager.ShowView(new LoadGameView());
+		Ctx.ViewManager.ShowCachedView(ViewKey.LOAD_GAME);
 	}
 
 	private void OnQuitSelected()

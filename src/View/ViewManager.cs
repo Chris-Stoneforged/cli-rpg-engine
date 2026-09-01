@@ -1,7 +1,6 @@
+using Data.Definitions;
 using Debug;
-using Models.Definitions;
 using Requests.Definitions;
-using Save.Definitions;
 using Spectre.Console;
 using Spectre.Console.Rendering;
 using View.Definitions;
@@ -10,26 +9,44 @@ namespace View;
 
 public class ViewManager(
 	IRequestDispatcher requestDispatcher,
-	IModelGetter modelGetter,
-	ISaveManager saveManager
+	ISessionFactory sessionFactory
 ) : IViewManager
 {
 	private readonly Stack<IView> _viewStack = new();
-	private ViewContext? _viewContext = null;
-
+	private readonly Dictionary<ViewKey, IView> _cachedViews = [];
 	private readonly IRequestDispatcher _requestDispatcher = requestDispatcher;
-	private readonly IModelGetter _modelGetter = modelGetter;
-	private readonly ISaveManager _saveManager = saveManager;
+	private readonly ISessionFactory _sessionFactory = sessionFactory;
+
+	private ViewContext? _viewContext = null;
 
 	public void ShowView(IView view)
 	{
-		_viewContext ??= new ViewContext(this, _requestDispatcher, _modelGetter, _saveManager);
+		_viewContext ??= new ViewContext(this, _requestDispatcher, _sessionFactory);
 		if (view is AView aView)
 		{
 			aView.Initialize(_viewContext);
 		}
 
 		_viewStack.Push(view);
+	}
+
+	public void ShowCachedView(ViewKey viewKey)
+	{
+		if (!_cachedViews.TryGetValue(viewKey, out var view))
+		{
+			DebugLog.Error($"No view cached for key {viewKey}");
+			return;
+		}
+
+		ShowView(view);
+	}
+
+	public void CacheView(ViewKey viewKey, IView view)
+	{
+		if (!_cachedViews.TryAdd(viewKey, view))
+		{
+			DebugLog.Error($"Could not cache view with key {viewKey}");
+		}
 	}
 
 	public void Back()

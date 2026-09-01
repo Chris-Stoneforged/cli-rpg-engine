@@ -2,18 +2,37 @@ using Requests;
 using View.Menu;
 using Spectre.Console;
 using Data.Definitions.Entities;
+using Microsoft.EntityFrameworkCore;
+using Debug;
 
 namespace View.Views;
 
-public class NavigateView(Location fromLocation) : AView
+public class NavigateView : AView
 {
-	private readonly Location _fromLocation = fromLocation;
-
 	public override void CleanUp() { }
 
 	public override async Task Loop()
 	{
-		var options = _fromLocation.DoorsOut.Select(
+		var db = Ctx.SessionFactory.GetReadonlySession();
+
+		var core = db.Core
+			.Include(c => c.CurrentLocation)
+			.ThenInclude(l => l.DoorsOut)
+			.FirstOrDefault();
+
+		if (core == null)
+		{
+			DebugLog.Error("Core does not exist");
+			return;
+		}
+
+		if (core.CurrentLocation == null)
+		{
+			DebugLog.Error("Current location does not exist");
+			return;
+		}
+
+		var options = core.CurrentLocation.DoorsOut.Select(
 			d => new MenuOption(
 				d.CallToAction,
 				() => OnLocationSelected(d)
@@ -30,6 +49,6 @@ public class NavigateView(Location fromLocation) : AView
 	private void OnLocationSelected(Door door)
 	{
 		Ctx.ViewManager.Back();
-		Ctx.RequestDispatcher.MakeRequest(new OpenDoorRequest(door));
+		Ctx.RequestDispatcher.MakeRequest(new OpenDoorRequest(door.Id));
 	}
 }

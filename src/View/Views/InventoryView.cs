@@ -1,48 +1,47 @@
 using View.Menu;
 using Spectre.Console;
-using Models.Definitions;
 using View.Menu.Displays;
 using Debug;
+using Data.Definitions.Entities;
+using Microsoft.EntityFrameworkCore;
 
 namespace View.Views;
 
 public class InventoryView() : AView
 {
-	private IInventoryModel? Inventory { get; set; }
-
-	public override void Initialize(ViewContext ctx)
-	{
-		base.Initialize(ctx);
-		Inventory = ctx.ModelGetter.GetAndNotify<IInventoryModel>(UpdateInventoryModel);
-	}
-
-	private void UpdateInventoryModel(IInventoryModel model)
-	{
-		Inventory = model;
-	}
-
-	public override void CleanUp()
-	{
-		Ctx.ModelGetter.UnNotify<IInventoryModel>(UpdateInventoryModel);
-	}
+	public override void CleanUp() { }
 
 	public override async Task Loop()
 	{
-		var options = Inventory?.InventoryItems
-			.Select(i => new MenuOption(
-				new InventoryItemDisplay(i),
-				() => OnInventoryItemSelected(i)))
-			.ToArray() ?? [];
+		using var db = Ctx.SessionFactory.GetReadonlySession();
+
+		var header = "Inventory";
+		MenuOption[] options = [];
+
+		if (db.InventoryEntries.Count() == 0)
+		{
+			header += " (Empty)";
+		}
+		else
+		{
+			options = db.InventoryEntries
+				.Include(e => e.Item)
+				.AsEnumerable()
+				.Select(p => new MenuOption(
+					new InventoryEntryDisplay(p),
+					() => OnInventoryItemSelected(p)))
+				.ToArray();
+		}
 
 		new MenuBuilder()
-			.Title("Inventory")
+			.Title(header)
 			.HasBackOption()
 			.AddOptions(options)
 			.Execute(Ctx);
 	}
 
-	private void OnInventoryItemSelected(IInventoryItem inventoryItem)
+	private void OnInventoryItemSelected(InventoryEntry inventoryEntry)
 	{
-		DebugLog.Info($"Checking out inventory item {inventoryItem.Item.Name}");
+		DebugLog.Info($"Checking out inventory item {inventoryEntry.Item?.Name}");
 	}
 }

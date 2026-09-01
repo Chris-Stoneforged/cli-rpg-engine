@@ -1,17 +1,21 @@
+using Data.Definitions.Entities;
 using Requests;
-using Save.Definitions;
 using View.Menu;
 using View.Menu.Displays;
 
 namespace View.Views;
 
-public class LoadGameView : AView
+public class LoadGameView(IReadOnlyCollection<SaveProfile> saveProfiles) : AView
 {
+	private readonly IReadOnlyCollection<SaveProfile> _saveProfiles = saveProfiles;
+
 	public override void CleanUp() { }
 
 	public override async Task Loop()
 	{
-		var options = Ctx.SaveManager.Profiles
+		using var db = Ctx.SessionFactory.GetReadonlySession();
+
+		var options = _saveProfiles
 			.Select(p => new MenuOption(
 				new SaveProfileDisplay(p),
 				() => OnSaveProfileSelected(p)))
@@ -24,8 +28,8 @@ public class LoadGameView : AView
 			.Execute(Ctx);
 	}
 
-	private void OnSaveProfileSelected(ISaveProfile profile)
+	private void OnSaveProfileSelected(SaveProfile profile)
 	{
-		Ctx.RequestDispatcher.MakeRequest(new LoadGameRequest(profile));
+		Ctx.RequestDispatcher.MakeRequest(new LoadGameRequest(profile.FilePath));
 	}
 }

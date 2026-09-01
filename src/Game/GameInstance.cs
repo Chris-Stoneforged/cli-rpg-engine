@@ -1,11 +1,11 @@
 using Controllers;
 using Events;
-using Models;
 using Requests;
 using View;
-using Save;
 using Data;
 using View.Views;
+using Debug;
+using View.Definitions;
 
 namespace Game;
 
@@ -14,34 +14,31 @@ public class GameInstance
 	private readonly ViewManager _viewManager;
 	private readonly RequestManager _requestManager;
 	private readonly EventManager _eventManager;
-	private readonly ModelManager _modelManager;
+	private readonly SessionFactory _sessionFactory;
 	private readonly SaveManager _saveManager;
-	private readonly ContextFactory _contextFactory;
 
 	private readonly LocationController _locationController;
 	private readonly InventoryController _inventoryController;
 
+	private readonly string _campaignPath;
+
 	public GameInstance(string campaignPath)
 	{
-		_modelManager = ModelManager.Create();
+		_campaignPath = campaignPath;
+
 		_eventManager = new EventManager();
 		_requestManager = new RequestManager();
-		_saveManager = new SaveManager();
-		_contextFactory = new ContextFactory(campaignPath);
-		_viewManager = new ViewManager(_requestManager, _modelManager, _saveManager);
+		_sessionFactory = new SessionFactory(campaignPath);
+		_saveManager = new SaveManager(campaignPath);
+		_viewManager = new ViewManager(_requestManager, _sessionFactory);
 
-		var ctx = new ControllerContext(
-			_modelManager,
-			_modelManager,
-			_requestManager,
-			_eventManager,
-			_eventManager,
-			_contextFactory,
-			_saveManager
-		);
+		var cachedLoadGameView = new LoadGameView(_saveManager.CachedProfiles);
+		var cachedMainMenuView = new MainMenuView(_saveManager.CachedProfiles);
+		_viewManager.CacheView(ViewKey.LOAD_GAME, cachedLoadGameView);
+		_viewManager.CacheView(ViewKey.MAIN_MENU, cachedMainMenuView);
 
-		_locationController = new LocationController(ctx);
-		_inventoryController = new InventoryController(ctx);
+		_locationController = new LocationController(_requestManager, _sessionFactory);
+		_inventoryController = new InventoryController(_requestManager, _sessionFactory);
 
 		_requestManager.RegisterHandler<QuitGameRequest>(HandleQuitGameRequest);
 		_requestManager.RegisterHandler<NewGameRequest>(HandleCreateSaveRequest);
@@ -65,7 +62,7 @@ public class GameInstance
 	void EnterMainMenu()
 	{
 		_viewManager.ResetStack();
-		_viewManager.ShowView(new MainMenuView());
+		_viewManager.ShowCachedView(ViewKey.MAIN_MENU);
 	}
 
 	void EnterGame()
@@ -81,23 +78,25 @@ public class GameInstance
 
 	void HandleCreateSaveRequest(NewGameRequest request)
 	{
-		if (_saveManager.CreateNewSaveFile())
+		var path = _saveManager.CreateSaveProfile();
+		if (path == null)
 		{
-			EnterGame();
+			return;
 		}
+
+		_sessionFactory.SetDatabasePath(path);
+		EnterGame();
 	}
 
 	void HandleSaveGameRequest(SaveGameRequest request)
 	{
-		_saveManager.SaveGameData();
+		// TODO: Something?
 	}
 
 	void HandleLoadGameRequest(LoadGameRequest request)
 	{
-		if (_saveManager.LoadSaveProfile(request.ProfileInfo))
-		{
-			EnterGame();
-		}
+		_sessionFactory.SetDatabasePath(request.SavePath);
+		EnterGame();
 	}
 
 	void HandleReturnToMainMenuRequest(ReturnToMainMenuRequest request)

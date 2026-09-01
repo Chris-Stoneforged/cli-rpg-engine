@@ -1,70 +1,62 @@
+using Data;
 using Debug;
 using Microsoft.EntityFrameworkCore;
-using Models;
-using Models.Definitions;
 using Requests;
-using Save;
+using Requests.Definitions;
 
 namespace Controllers;
 
-public class LocationController : AController
+public class LocationController
 {
-	public LocationController(ControllerContext ctx) : base(ctx)
+	private readonly SessionFactory _sessionFactory;
+
+	public LocationController(IRequestListener listener, SessionFactory sessionFactory)
 	{
-		_ctx.RequestListener.RegisterHandler<OpenDoorRequest>(HandleOpenDoorRequest);
-		_ctx.SaveSystem.RegisterLoadHandler<LocationSaveData>("location", OnLocationDataLoaded);
-		_ctx.SaveSystem.RegisterSaveHandler("location", GetLocationSaveData);
+		_sessionFactory = sessionFactory;
+		listener.RegisterHandler<OpenDoorRequest>(HandleOpenDoorRequest);
 	}
 
 	private void HandleOpenDoorRequest(OpenDoorRequest request)
 	{
+		using var db = _sessionFactory.GetSession();
 
-		var locationModel = _ctx.ModelGetter.GetModel<ILocationModel>();
-		if (locationModel == null) return;
+		var door = db.Doors
+			.Include(d => d.To)
+			.Include(d => d.From)
+			.FirstOrDefault(d => d.Id == request.DoorId);
 
-		if (request.Door.FromId != locationModel.CurrentLocation?.Id)
+		if (door == null)
+		{
+			DebugLog.Error($"Could not find door with Id {request.DoorId}");
+			return;
+		}
+
+		var core = db.Core.Include(c => c.CurrentLocation).FirstOrDefault();
+		if (core == null)
+		{
+			DebugLog.Error("Could not get core");
+			return;
+		}
+
+		if (core.CurrentLocation == null)
+		{
+			DebugLog.Error("Could not get current location");
+			return;
+		}
+
+		if (door.From != core.CurrentLocation)
 		{
 			DebugLog.Error("Attempting to use door that is not in the current location");
 			return;
 		}
 
-		_ctx.ModelUpdater.UpdateModel<LocationModel>(
-			l => l.CurrentLocation = request.Door.To
-		);
-	}
-
-	#region SAVE_AND_LOAD
-	private void OnLocationDataLoaded(LocationSaveData saveData)
-	{
-		using var db = _ctx.DataFactory.GetCampaignData();
-
-		var location = db.Locations
-			.Include(l => l.ItemPickups)
-			.ThenInclude(p => p.Item)
-			.Include(l => l.DoorsOut)
-			.ThenInclude(d => d.To)
-			.SingleOrDefault(l => l.Id == saveData.CurrentLocationId);
-
-		if (location == null)
+		if (door.To == null)
 		{
-			DebugLog.Error("Could not load current location - ID is invalid");
+			DebugLog.Error("Door leads to null");
 			return;
 		}
 
-		_ctx.ModelUpdater.UpdateModel<LocationModel>(
-				m => m.CurrentLocation = location
-				);
+		core.CurrentLocation = door.To;
+		db.SaveChanges();
 	}
-
-	private LocationSaveData? GetLocationSaveData()
-	{
-		var locationModel = _ctx.ModelGetter.GetModel<ILocationModel>();
-		return locationModel == null ?
-			null :
-			new LocationSaveData()
-			{
-				CurrentLocationId = locationModel.CurrentLocation?.Id ?? 1
-			};
-	}
-	#endregion
 }

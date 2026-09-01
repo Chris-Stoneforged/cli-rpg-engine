@@ -1,9 +1,9 @@
-using Save.Definitions;
+using Data.Definitions.Entities;
 using View.Definitions;
 
 namespace View.Menu.Displays;
 
-public class SaveProfileDisplay(ISaveProfile profile) : IMenuOptionDisplay
+public class SaveProfileDisplay(SaveProfile profile) : IMenuOptionDisplay
 {
-	public string DisplayMarkup => $"Save {profile.Name} - {profile.LastSavedTime}";
+	public string DisplayMarkup => $"Save {profile.Id}";
 }

@@ -2,14 +2,11 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Events\Events.csproj" />
-    <ProjectReference Include="..\Models\Models.csproj" />
     <ProjectReference Include="..\Requests\Requests.csproj" />
     <ProjectReference Include="..\View\View.csproj" />
     <ProjectReference Include="..\Controllers\Controllers.csproj" />
     <ProjectReference Include="..\Debug\Debug.csproj" />
-    <ProjectReference Include="..\Save\Save.csproj" />
     <ProjectReference Include="..\View.Definitions\View.Definitions.csproj" />
-    <ProjectReference Include="..\Save.Definitions\Save.Definitions.csproj" />
     <ProjectReference Include="..\Data\Data.csproj" />
   </ItemGroup>
 

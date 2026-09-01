@@ -1,8 +1,6 @@
-using Data.Definitions.Entities;
-
 namespace Requests;
 
-public class OpenDoorRequest(Door door) : AGameRequest
+public class OpenDoorRequest(int doorId) : AGameRequest
 {
-	public Door Door { get; } = door;
+	public int DoorId { get; } = doorId;
 }
