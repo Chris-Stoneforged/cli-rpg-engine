@@ -13,6 +13,7 @@ public class GameDatabase(string campaignPath) : DbContext, IGameDatabase
 	public DbSet<Item> Items { get; set; }
 	public DbSet<ItemPickup> ItemPickups { get; set; }
 	public DbSet<InventoryEntry> InventoryEntries { get; set; }
+	public DbSet<Character> Characters { get; set; }
 
 	private readonly string _campaignPath = campaignPath;
 

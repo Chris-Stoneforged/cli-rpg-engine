@@ -1,0 +1,61 @@
+using View.Menu;
+using Spectre.Console;
+using Data.Definitions.Entities;
+using Microsoft.EntityFrameworkCore;
+using Debug;
+
+namespace View.Views;
+
+public class ChatView : AView
+{
+	public override void CleanUp() { }
+
+	public override async Task Loop()
+	{
+		var db = Ctx.SessionFactory.GetReadonlySession();
+
+		var core = db.Core
+			.Include(c => c.PlayerCharacter)
+			.ThenInclude(c => c.Location)
+			.ThenInclude(l => l.Characters)
+			.FirstOrDefault();
+
+		if (core == null)
+		{
+			DebugLog.Error("Core does not exist");
+			return;
+		}
+
+		if (core.PlayerCharacter == null)
+		{
+			DebugLog.Error("Could not get player character");
+			return;
+		}
+
+		if (core.PlayerCharacter.Location == null)
+		{
+			DebugLog.Error("Could not get player's location");
+			return;
+		}
+
+		var options = core.PlayerCharacter.Location.Characters
+			.Where(c => c != core.PlayerCharacter)
+			.Select(
+				c => new MenuOption(
+					c.Name,
+					() => OnCharacterSelected(c)
+			)
+		).ToArray();
+
+		new MenuBuilder()
+			.Title("Who do you want to talk to?")
+			.HasBackOption()
+			.AddOptions(options)
+			.Execute(Ctx);
+	}
+
+	private void OnCharacterSelected(Character character)
+	{
+		DebugLog.Info($"Interaction began with {character.Name}");
+	}
+}

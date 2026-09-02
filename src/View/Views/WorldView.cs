@@ -33,6 +33,7 @@ public class WorldView : AView
 			.Title("What do you want to do?")
 			.AddOption("Navigate", OnNavigateSelected)
 			.AddOption("Search", OnSearchSelected)
+			.AddOption("Chat", OnChatSelected)
 			.AddOption("Inventory", OnInventorySelected)
 			.AddOption("Options", OnOptionsSelected)
 			.Execute(Ctx);
@@ -46,6 +47,11 @@ public class WorldView : AView
 	private void OnSearchSelected()
 	{
 		Ctx.ViewManager.ShowView(new SearchView());
+	}
+
+	private void OnChatSelected()
+	{
+		Ctx.ViewManager.ShowView(new ChatView());
 	}
 
 	private void OnInventorySelected()

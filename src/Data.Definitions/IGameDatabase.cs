@@ -12,4 +12,5 @@ public interface IGameDatabase : IDisposable
 	public DbSet<Item> Items { get; }
 	public DbSet<ItemPickup> ItemPickups { get; }
 	public DbSet<InventoryEntry> InventoryEntries { get; }
+	public DbSet<Character> Characters { get; set; }
 }

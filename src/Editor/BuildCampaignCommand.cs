@@ -45,7 +45,7 @@ public class BuildCampaignCommand
 
 	public async Task<int> Build(ParseResult result, CancellationToken token)
 	{
-		var campaignPath = result.GetValue(_campaignPathOption);
+		var campaignPath = result.GetValue(_campaignPathOption)?.ToString();
 		var outputPath = result.GetValue(_outputFileOption);
 
 		if (campaignPath == null || outputPath == null)
@@ -64,58 +64,11 @@ public class BuildCampaignCommand
 				await db.Database.EnsureDeletedAsync(token);
 				await db.Database.EnsureCreatedAsync(token);
 
-				var doorsPath = Path.Combine(campaignPath.ToString(), "doors");
-				foreach (var p in Directory.EnumerateFiles(doorsPath))
-				{
-					var contents = await File.ReadAllTextAsync(p);
-					var door = JsonConvert.DeserializeObject<Door>(contents);
-					if (door == null)
-					{
-						continue;
-					}
-
-					await db.Doors.AddAsync(door);
-				}
-
-				var locationsPath = Path.Combine(campaignPath.ToString(), "locations");
-				foreach (var p in Directory.EnumerateFiles(locationsPath))
-				{
-					var contents = await File.ReadAllTextAsync(p);
-					var location = JsonConvert.DeserializeObject<Location>(contents);
-					if (location == null)
-					{
-						continue;
-					}
-
-					await db.Locations.AddAsync(location);
-				}
-
-				var itemsPath = Path.Combine(campaignPath.ToString(), "items");
-				foreach (var p in Directory.EnumerateFiles(itemsPath))
-				{
-					var contents = await File.ReadAllTextAsync(p);
-					var item = JsonConvert.DeserializeObject<Item>(contents);
-					if (item == null)
-					{
-						continue;
-					}
-
-					await db.Items.AddAsync(item);
-				}
-
-
-				var itemPickupsPath = Path.Combine(campaignPath.ToString(), "item-pickups");
-				foreach (var p in Directory.EnumerateFiles(itemPickupsPath))
-				{
-					var contents = await File.ReadAllTextAsync(p);
-					var itemPickup = JsonConvert.DeserializeObject<ItemPickup>(contents);
-					if (itemPickup == null)
-					{
-						continue;
-					}
-
-					await db.ItemPickups.AddAsync(itemPickup);
-				}
+				await LoadEntities(db.Doors, Path.Combine(campaignPath, "doors"));
+				await LoadEntities(db.Locations, Path.Combine(campaignPath, "locations"));
+				await LoadEntities(db.Items, Path.Combine(campaignPath, "items"));
+				await LoadEntities(db.ItemPickups, Path.Combine(campaignPath, "item-pickups"));
+				await LoadEntities(db.Characters, Path.Combine(campaignPath, "characters"));
 
 				await db.SaveChangesAsync();
 				return 0;
@@ -126,5 +79,23 @@ public class BuildCampaignCommand
 			AnsiConsole.WriteLine($"Successfully built campaign to {outputPath.FullName}");
 		}
 		return code;
+	}
+
+	public async Task LoadEntities<TEntity>(
+		DbSet<TEntity> dbSet,
+		string path
+	) where TEntity : Entity
+	{
+		foreach (var p in Directory.EnumerateFiles(path))
+		{
+			var contents = await File.ReadAllTextAsync(p);
+			var entity = JsonConvert.DeserializeObject<TEntity>(contents);
+			if (entity == null)
+			{
+				continue;
+			}
+
+			await dbSet.AddAsync(entity);
+		}
 	}
 }
