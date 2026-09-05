@@ -19,6 +19,7 @@ public class GameInstance
 
 	private readonly LocationController _locationController;
 	private readonly InventoryController _inventoryController;
+	private readonly EncounterController _encounterController;
 
 	private readonly string _campaignPath;
 
@@ -32,13 +33,14 @@ public class GameInstance
 		_saveManager = new SaveManager(campaignPath);
 		_viewManager = new ViewManager(_requestManager, _sessionFactory);
 
-		var cachedLoadGameView = new LoadGameView(_saveManager.CachedProfiles);
-		var cachedMainMenuView = new MainMenuView(_saveManager.CachedProfiles);
+		var cachedLoadGameView = new LoadGameView(_saveManager.SavePaths);
+		var cachedMainMenuView = new MainMenuView(_saveManager.SavePaths);
 		_viewManager.CacheView(ViewKey.LOAD_GAME, cachedLoadGameView);
 		_viewManager.CacheView(ViewKey.MAIN_MENU, cachedMainMenuView);
 
 		_locationController = new LocationController(_requestManager, _sessionFactory);
 		_inventoryController = new InventoryController(_requestManager, _sessionFactory);
+		_encounterController = new EncounterController(_requestManager, _viewManager, _sessionFactory);
 
 		_requestManager.RegisterHandler<QuitGameRequest>(HandleQuitGameRequest);
 		_requestManager.RegisterHandler<NewGameRequest>(HandleCreateSaveRequest);

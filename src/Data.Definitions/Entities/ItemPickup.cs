@@ -3,10 +3,10 @@ using Newtonsoft.Json;
 namespace Data.Definitions.Entities;
 
 [JsonObject(MemberSerialization.OptIn)]
-public class ItemPickup : Entity
+public class ItemPickup : DbEntity
 {
-	public Location? Location { get; set; }
-	public Item? Item { get; set; }
+	public virtual Location? Location { get; set; }
+	public virtual Item? Item { get; set; }
 
 	[JsonProperty("location_id")]
 	public int LocationId { get; set; }
@@ -14,4 +14,9 @@ public class ItemPickup : Entity
 	public int ItemId { get; set; }
 	[JsonProperty("quantity")]
 	public int Quantity { get; set; }
+
+	public override string Repr()
+	{
+		return $"{Item?.Name} ({Quantity}) at {Location?.Repr()}";
+	}
 }

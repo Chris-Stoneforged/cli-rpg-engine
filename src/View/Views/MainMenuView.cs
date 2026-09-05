@@ -1,13 +1,12 @@
-using Data.Definitions.Entities;
 using Requests;
 using View.Definitions;
 using View.Menu;
 
 namespace View.Views;
 
-public class MainMenuView(IReadOnlyCollection<SaveProfile> saveProfiles) : AView
+public class MainMenuView(IReadOnlyCollection<string> savePaths) : AView
 {
-	private readonly IReadOnlyCollection<SaveProfile> _saveProfiles = saveProfiles;
+	private readonly IReadOnlyCollection<string> _saveProfiles = savePaths;
 
 	public override async Task Loop()
 	{

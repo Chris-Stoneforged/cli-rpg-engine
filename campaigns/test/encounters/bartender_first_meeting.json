@@ -1,0 +1,20 @@
+{
+	"id": 1,
+	"repeatable": false,
+	"steps": 
+	[
+		{
+			"id": 1,
+			"type": "dialogue",
+			"dialogue": "Welcome to the Last frontier inn!",
+			"speaker_id": 1,
+			"next_step_id": 2
+		},
+		{
+			"id": 2,
+			"type": "dialogue",
+			"dialogue": "You must be pretty lost to wind up here",
+			"speaker_id": 1,
+		}
+	]
+}

@@ -1,13 +1,12 @@
-using Data.Definitions.Entities;
 using Requests;
 using View.Menu;
 using View.Menu.Displays;
 
 namespace View.Views;
 
-public class LoadGameView(IReadOnlyCollection<SaveProfile> saveProfiles) : AView
+public class LoadGameView(IReadOnlyCollection<string> savePaths) : AView
 {
-	private readonly IReadOnlyCollection<SaveProfile> _saveProfiles = saveProfiles;
+	private readonly IReadOnlyCollection<string> _savePaths = savePaths;
 
 	public override void CleanUp() { }
 
@@ -15,7 +14,7 @@ public class LoadGameView(IReadOnlyCollection<SaveProfile> saveProfiles) : AView
 	{
 		using var db = Ctx.SessionFactory.GetReadonlySession();
 
-		var options = _saveProfiles
+		var options = _savePaths
 			.Select(p => new MenuOption(
 				new SaveProfileDisplay(p),
 				() => OnSaveProfileSelected(p)))
@@ -28,8 +27,8 @@ public class LoadGameView(IReadOnlyCollection<SaveProfile> saveProfiles) : AView
 			.Execute(Ctx);
 	}
 
-	private void OnSaveProfileSelected(SaveProfile profile)
+	private void OnSaveProfileSelected(string path)
 	{
-		Ctx.RequestDispatcher.MakeRequest(new LoadGameRequest(profile.FilePath));
+		Ctx.RequestDispatcher.MakeRequest(new LoadGameRequest(path));
 	}
 }

@@ -3,6 +3,7 @@ using Spectre.Console;
 using Data.Definitions.Entities;
 using Microsoft.EntityFrameworkCore;
 using Debug;
+using Requests;
 
 namespace View.Views;
 
@@ -14,12 +15,7 @@ public class ChatView : AView
 	{
 		var db = Ctx.SessionFactory.GetReadonlySession();
 
-		var core = db.Core
-			.Include(c => c.PlayerCharacter)
-			.ThenInclude(c => c.Location)
-			.ThenInclude(l => l.Characters)
-			.FirstOrDefault();
-
+		var core = db.Core.FirstOrDefault();
 		if (core == null)
 		{
 			DebugLog.Error("Core does not exist");
@@ -49,6 +45,7 @@ public class ChatView : AView
 
 		new MenuBuilder()
 			.Title("Who do you want to talk to?")
+			.TitleWhenNoOptions("There appears to be nobody around")
 			.HasBackOption()
 			.AddOptions(options)
 			.Execute(Ctx);
@@ -56,6 +53,6 @@ public class ChatView : AView
 
 	private void OnCharacterSelected(Character character)
 	{
-		DebugLog.Info($"Interaction began with {character.Name}");
+		Ctx.RequestDispatcher.MakeRequest(new CharacterInteractionRequest(character.Id));
 	}
 }

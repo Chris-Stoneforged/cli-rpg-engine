@@ -5,7 +5,7 @@ namespace Data;
 
 public class SaveManager
 {
-	public readonly List<SaveProfile> CachedProfiles = [];
+	public readonly List<string> SavePaths = [];
 
 	private readonly string _campaignPath;
 
@@ -19,26 +19,11 @@ public class SaveManager
 		{
 			return;
 		}
-
-		foreach (var filePath in Directory.EnumerateFiles(saveFolder).Where(p => p.EndsWith(".db")))
+		DebugLog.Info(saveFolder);
+		SavePaths = [.. Directory.EnumerateFiles(saveFolder).Where(p => p.EndsWith(".db"))];
+		foreach (var v in SavePaths)
 		{
-			Console.WriteLine(filePath);
-			using var db = new GameDatabase(filePath);
-
-			var saveData = db.SaveProfile.FirstOrDefault();
-			if (saveData == null)
-			{
-				DebugLog.Error($"No save profile info for file at {filePath}");
-				continue;
-			}
-
-			CachedProfiles.Add(
-				new SaveProfile()
-				{
-					Id = saveData.Id,
-					FilePath = saveData.FilePath
-				}
-			);
+			DebugLog.Info(v);
 		}
 	}
 
@@ -79,14 +64,7 @@ public class SaveManager
 				}
 			);
 
-			var saveProfile = new SaveProfile()
-			{
-				Id = index,
-				FilePath = savePath
-			};
-
-			CachedProfiles.Add(saveProfile);
-			db.SaveProfile.Add(saveProfile);
+			SavePaths.Add(savePath);
 			db.SaveChanges();
 		}
 

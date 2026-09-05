@@ -21,11 +21,7 @@ public class InventoryController
 	{
 		using var db = _sessionFactory.GetSession();
 
-		var pickup = db.ItemPickups
-			.Include(p => p.Item)
-			.Include(p => p.Location)
-			.ThenInclude(l => l.ItemPickups)
-			.FirstOrDefault(p => p.Id == request.PickupId);
+		var pickup = db.ItemPickups.FirstOrDefault(p => p.Id == request.PickupId);
 
 		if (pickup == null)
 		{
@@ -45,10 +41,7 @@ public class InventoryController
 			return;
 		}
 
-		var core = db.Core
-			.Include(c => c.PlayerCharacter)
-			.ThenInclude(c => c.Location)
-			.FirstOrDefault();
+		var core = db.Core.FirstOrDefault();
 		if (core == null)
 		{
 			DebugLog.Error("Could not get core");

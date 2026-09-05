@@ -1,6 +1,11 @@
 namespace Data.Definitions.Entities;
 
-public class GameCore : Entity
+public class GameCore : DbEntity
 {
-	public Character? PlayerCharacter { get; set; }
+	public virtual Character? PlayerCharacter { get; set; }
+
+	public override string Repr()
+	{
+		return "";
+	}
 }

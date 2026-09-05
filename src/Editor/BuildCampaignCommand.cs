@@ -1,11 +1,11 @@
-namespace Editor;
-
 using System.CommandLine;
 using Data;
-using Data.Definitions.Entities;
+using Data.Definitions;
 using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json;
 using Spectre.Console;
+
+namespace Editor;
 
 public class BuildCampaignCommand
 {
@@ -69,6 +69,7 @@ public class BuildCampaignCommand
 				await LoadEntities(db.Items, Path.Combine(campaignPath, "items"));
 				await LoadEntities(db.ItemPickups, Path.Combine(campaignPath, "item-pickups"));
 				await LoadEntities(db.Characters, Path.Combine(campaignPath, "characters"));
+				await LoadEntities(db.Encounters, Path.Combine(campaignPath, "encounters"));
 
 				await db.SaveChangesAsync();
 				return 0;
@@ -84,7 +85,7 @@ public class BuildCampaignCommand
 	public async Task LoadEntities<TEntity>(
 		DbSet<TEntity> dbSet,
 		string path
-	) where TEntity : Entity
+	) where TEntity : DbEntity
 	{
 		foreach (var p in Directory.EnumerateFiles(path))
 		{

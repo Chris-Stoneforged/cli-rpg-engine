@@ -14,7 +14,9 @@ public class MenuBuilder
 	private readonly List<MenuOption> _menuOptions = [];
 
 	private string _title = "";
+	private string _titleIfNoOptions = "";
 	private bool _hasBackOption = false;
+	private bool _doBack = false;
 
 	public MenuBuilder Title(string title)
 	{
@@ -22,13 +24,19 @@ public class MenuBuilder
 		return this;
 	}
 
-	public MenuBuilder AddOption(IMenuOptionDisplay display, Action callback)
+	public MenuBuilder TitleWhenNoOptions(string title)
+	{
+		_titleIfNoOptions = title;
+		return this;
+	}
+
+	public MenuBuilder AddOption(IMenuOptionDisplay display, Action? callback)
 	{
 		_menuOptions.Add(new MenuOption(display, callback));
 		return this;
 	}
 
-	public MenuBuilder AddOptionIf(Func<bool> condition, IMenuOptionDisplay display, Action callback)
+	public MenuBuilder AddOptionIf(Func<bool> condition, IMenuOptionDisplay display, Action? callback)
 	{
 		if (condition())
 		{
@@ -37,13 +45,13 @@ public class MenuBuilder
 		return this;
 	}
 
-	public MenuBuilder AddOption(string text, Action callback)
+	public MenuBuilder AddOption(string text, Action? callback)
 	{
 		_menuOptions.Add(new MenuOption(text, callback));
 		return this;
 	}
 
-	public MenuBuilder AddOptionIf(Func<bool> condition, string text, Action callback)
+	public MenuBuilder AddOptionIf(Func<bool> condition, string text, Action? callback)
 	{
 		if (condition())
 		{
@@ -67,24 +75,29 @@ public class MenuBuilder
 		return this;
 	}
 
-	public MenuBuilder HasBackOption()
+	public MenuBuilder HasBackOption(bool doBack = true)
 	{
 		_hasBackOption = true;
+		_doBack = doBack;
 		return this;
 	}
 
 	public void Execute(ViewContext ctx)
 	{
+		var title = _menuOptions.Count == 0 && !string.IsNullOrEmpty(_titleIfNoOptions) ?
+			_titleIfNoOptions :
+			_title;
+
 		if (_hasBackOption)
 		{
-			AddOption(new BackDisplay(), ctx.ViewManager.Back);
+			AddOption(new BackDisplay(), _doBack ? ctx.ViewManager.Back : null);
 		}
 
 		_prompt
-			.Title(_title)
+			.Title(title)
 			.AddChoices(_menuOptions);
 
 		var choice = AnsiConsole.Prompt(_prompt);
-		choice.Callback.Invoke();
+		choice.Callback?.Invoke();
 	}
 }

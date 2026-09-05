@@ -3,10 +3,10 @@ using Newtonsoft.Json;
 namespace Data.Definitions.Entities;
 
 [JsonObject(MemberSerialization.OptIn)]
-public class Door : Entity
+public class Door : DbEntity
 {
-	public Location? From { get; set; }
-	public Location? To { get; set; }
+	public virtual Location? From { get; set; }
+	public virtual Location? To { get; set; }
 
 	[JsonProperty("from_id")]
 	public int FromId { get; set; }
@@ -14,4 +14,9 @@ public class Door : Entity
 	public int ToId { get; set; }
 	[JsonProperty("call_to_action")]
 	public string CallToAction { get; set; } = "";
+
+	public override string Repr()
+	{
+		return $"Door from {From?.Repr()} to {To?.Repr()}";
+	}
 }

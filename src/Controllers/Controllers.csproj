@@ -9,6 +9,7 @@
     <ProjectReference Include="..\Debug\Debug.csproj" />
     <ProjectReference Include="..\Data.Definitions\Data.Definitions.csproj" />
     <ProjectReference Include="..\Data\Data.csproj" />
+    <ProjectReference Include="..\Encounter\Encounter.csproj" />
   </ItemGroup>
 
   <ItemGroup>

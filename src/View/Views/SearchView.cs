@@ -3,7 +3,6 @@ using View.Menu;
 using Spectre.Console;
 using Data.Definitions.Entities;
 using View.Menu.Displays;
-using Microsoft.EntityFrameworkCore;
 
 namespace View.Views;
 
@@ -15,28 +14,38 @@ public class SearchView : AView
 	{
 		var db = Ctx.SessionFactory.GetReadonlySession();
 
-		var core = db.Core
-			.Include(c => c.PlayerCharacter)
-			.ThenInclude(c => c.Location)
-			.ThenInclude(l => l.ItemPickups)
-			.ThenInclude(i => i.Item)
-			.FirstOrDefault();
-
+		var core = db.Core.FirstOrDefault();
 		var options = core?.PlayerCharacter?.Location?.ItemPickups
 			.Select(p => new MenuOption(
 				new ItemPickupDisplay(p),
-				() => OnItemPickedUp(p)))
+				() => OnItemSelected(p)))
 			.ToArray() ?? [];
 
 		new MenuBuilder()
-			.Title(options.Length == 0 ? "You find nothing of interest" : "You find these items")
+			.Title("You find these items")
+			.TitleWhenNoOptions("You find nothing of interest")
 			.HasBackOption()
 			.AddOptions(options)
 			.Execute(Ctx);
 	}
 
-	private void OnItemPickedUp(ItemPickup pickup)
+	private void OnItemSelected(ItemPickup pickup)
+	{
+		new MenuBuilder()
+			.Title(pickup.Item?.Name ?? "???")
+			.HasBackOption(false)
+			.AddOption("Take All", () => OnTakeAllSelected(pickup))
+			.AddOption("Take Some", () => OnTakeSomeSelected(pickup))
+			.Execute(Ctx);
+	}
+
+	private void OnTakeAllSelected(ItemPickup pickup)
 	{
 		Ctx.RequestDispatcher.MakeRequest(new PickUpItemRequest(pickup.Id, pickup.Quantity));
+	}
+
+	private void OnTakeSomeSelected(ItemPickup pickup)
+	{
+
 	}
 }

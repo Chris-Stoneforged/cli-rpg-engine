@@ -6,15 +6,15 @@ namespace View.Menu;
 public class MenuOption
 {
 	public readonly IMenuOptionDisplay Display;
-	public readonly Action Callback;
+	public readonly Action? Callback;
 
-	public MenuOption(IMenuOptionDisplay display, Action callback)
+	public MenuOption(IMenuOptionDisplay display, Action? callback)
 	{
 		Display = display;
 		Callback = callback;
 	}
 
-	public MenuOption(string text, Action callback)
+	public MenuOption(string text, Action? callback)
 	{
 		Display = new TextDisplay(text);
 		Callback = callback;

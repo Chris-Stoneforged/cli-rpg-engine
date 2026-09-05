@@ -10,10 +10,7 @@ public class WorldView : AView
 	public override IRenderable? Before()
 	{
 		using var db = Ctx.SessionFactory.GetReadonlySession();
-		var core = db.Core
-			.Include(c => c.PlayerCharacter)
-			.ThenInclude(c => c.Location)
-			.FirstOrDefault();
+		var core = db.Core.FirstOrDefault();
 
 		var locationName = core == null ||
 			core.PlayerCharacter == null ||

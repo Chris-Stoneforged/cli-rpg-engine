@@ -15,12 +15,7 @@ public class NavigateView : AView
 	{
 		var db = Ctx.SessionFactory.GetReadonlySession();
 
-		var core = db.Core
-			.Include(c => c.PlayerCharacter)
-			.ThenInclude(c => c.Location)
-			.ThenInclude(l => l.DoorsOut)
-			.FirstOrDefault();
-
+		var core = db.Core.FirstOrDefault();
 		if (core == null)
 		{
 			DebugLog.Error("Core does not exist");

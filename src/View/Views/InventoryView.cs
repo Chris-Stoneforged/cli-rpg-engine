@@ -1,9 +1,7 @@
 using View.Menu;
 using Spectre.Console;
 using View.Menu.Displays;
-using Debug;
 using Data.Definitions.Entities;
-using Microsoft.EntityFrameworkCore;
 
 namespace View.Views;
 
@@ -15,12 +13,7 @@ public class InventoryView() : AView
 	{
 		using var db = Ctx.SessionFactory.GetReadonlySession();
 
-		var core = db.Core
-			.Include(c => c.PlayerCharacter)
-			.ThenInclude(c => c.InventoryEntries)
-			.ThenInclude(e => e.Item)
-			.FirstOrDefault();
-
+		var core = db.Core.FirstOrDefault();
 		var options = core?.PlayerCharacter?.InventoryEntries
 			.Select(p => new MenuOption(
 				new InventoryEntryDisplay(p),
@@ -28,7 +21,8 @@ public class InventoryView() : AView
 			.ToArray() ?? [];
 
 		new MenuBuilder()
-			.Title(options.Length == 0 ? "Inventory (Empty)" : "Inventory")
+			.Title("Inventory")
+			.TitleWhenNoOptions("Inventory (Emtpy)")
 			.HasBackOption()
 			.AddOptions(options)
 			.Execute(Ctx);
@@ -36,6 +30,9 @@ public class InventoryView() : AView
 
 	private void OnInventoryItemSelected(InventoryEntry inventoryEntry)
 	{
-		DebugLog.Info($"Checking out inventory item {inventoryEntry.Item?.Name}");
+		new MenuBuilder()
+			.Title($"[bold]{inventoryEntry.Item.Name}[/] ({inventoryEntry.Quantity})\n\n[italic]{inventoryEntry.Item.Description}[/]")
+			.HasBackOption(false)
+			.Execute(Ctx);
 	}
 }

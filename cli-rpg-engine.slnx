@@ -6,6 +6,7 @@
     <Project Path="src/Data/Data.csproj" />
     <Project Path="src/Debug/Debug.csproj" />
     <Project Path="src/Editor/Editor.csproj" />
+    <Project Path="src/Encounter/Encounter.csproj" />
     <Project Path="src/Events.Definitions/Events.Definitions.csproj" />
     <Project Path="src/Events/Events.csproj" />
     <Project Path="src/Game/Game.csproj" />

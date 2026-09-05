@@ -9,3 +9,6 @@ barg:
 
 bc:
 	dotnet build src/Editor && dotnet run --project src/Editor -- build-campaign -p "./campaigns/test" -o "./campaigns/test/campaign.db"
+
+bart:
+	dotnet build src/Test && dotnet run --project src/Test

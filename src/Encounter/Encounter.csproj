@@ -1,12 +1,8 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <ItemGroup>
-    <ProjectReference Include="..\View.Definitions\View.Definitions.csproj" />
-    <ProjectReference Include="..\Requests.Definitions\Requests.Definitions.csproj" />
-    <ProjectReference Include="..\Requests\Requests.csproj" />
-    <ProjectReference Include="..\Debug\Debug.csproj" />
+    <ProjectReference Include="..\Core.Definitions\Core.Definitions.csproj" />
     <ProjectReference Include="..\Data.Definitions\Data.Definitions.csproj" />
-    <ProjectReference Include="..\Encounter\Encounter.csproj" />
   </ItemGroup>
 
   <ItemGroup>

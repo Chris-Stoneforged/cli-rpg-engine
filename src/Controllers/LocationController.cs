@@ -20,11 +20,7 @@ public class LocationController
 	{
 		using var db = _sessionFactory.GetSession();
 
-		var door = db.Doors
-			.Include(d => d.To)
-			.Include(d => d.From)
-			.FirstOrDefault(d => d.Id == request.DoorId);
-
+		var door = db.Doors.FirstOrDefault(d => d.Id == request.DoorId);
 		if (door == null)
 		{
 			DebugLog.Error($"Could not find door with Id {request.DoorId}");
@@ -43,10 +39,7 @@ public class LocationController
 			return;
 		}
 
-		var core = db.Core
-			.Include(c => c.PlayerCharacter)
-			.ThenInclude(c => c.Location)
-			.FirstOrDefault();
+		var core = db.Core.FirstOrDefault();
 		if (core == null)
 		{
 			DebugLog.Error("Could not get core");
@@ -58,7 +51,6 @@ public class LocationController
 			DebugLog.Error("Attempting to use door that is not in the current location");
 			return;
 		}
-
 
 		core.PlayerCharacter.Location = door.To;
 		db.SaveChanges();

@@ -5,7 +5,7 @@ using Newtonsoft.Json.Converters;
 namespace Data.Definitions.Entities;
 
 [JsonObject(MemberSerialization.OptIn)]
-public class Item : Entity
+public class Item : DbEntity
 {
 	[JsonProperty("name")]
 	public string Name { get; set; } = "";
@@ -14,6 +14,11 @@ public class Item : Entity
 	[JsonProperty("type"), JsonConverter(typeof(StringEnumConverter))]
 	public ItemType Type { get; set; } = ItemType.REGULAR;
 
-	public ICollection<ItemPickup> ItemPickups { get; set; } = [];
-	public ICollection<InventoryEntry> InventoryEntries { get; set; } = [];
+	public virtual ICollection<ItemPickup> ItemPickups { get; set; } = [];
+	public virtual ICollection<InventoryEntry> InventoryEntries { get; set; } = [];
+
+	public override string Repr()
+	{
+		return Name;
+	}
 }
