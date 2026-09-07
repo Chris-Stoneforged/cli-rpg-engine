@@ -1,16 +1,16 @@
 using Data.Definitions;
-using Requests.Definitions;
+using Events.Definitions;
 using View.Definitions;
 
 namespace View;
 
 public class ViewContext(
 	IViewManager viewManager,
-	IRequestDispatcher requestDispatcher,
+	IEventTrigger eventEmitter,
 	ISessionFactory sessionFactory
 )
 {
 	public readonly ISessionFactory SessionFactory = sessionFactory;
 	public readonly IViewManager ViewManager = viewManager;
-	public readonly IRequestDispatcher RequestDispatcher = requestDispatcher;
+	public readonly IEventTrigger EventEmitter = eventEmitter;
 }

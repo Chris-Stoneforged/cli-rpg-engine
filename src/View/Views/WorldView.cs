@@ -1,4 +1,3 @@
-using Microsoft.EntityFrameworkCore;
 using Spectre.Console;
 using Spectre.Console.Rendering;
 using View.Menu;

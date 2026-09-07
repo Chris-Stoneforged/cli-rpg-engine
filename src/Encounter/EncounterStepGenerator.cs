@@ -1,6 +1,6 @@
-using Core.Definitions;
 using Core.Definitions.Enums;
 using Data.Definitions.Encounter;
+using Encounter.Definitions;
 
 namespace Encounter;
 

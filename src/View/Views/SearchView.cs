@@ -1,8 +1,8 @@
-using Requests;
 using View.Menu;
 using Spectre.Console;
 using Data.Definitions.Entities;
 using View.Menu.Displays;
+using Events.Definitions.Game;
 
 namespace View.Views;
 
@@ -41,7 +41,7 @@ public class SearchView : AView
 
 	private void OnTakeAllSelected(ItemPickup pickup)
 	{
-		Ctx.RequestDispatcher.MakeRequest(new PickUpItemRequest(pickup.Id, pickup.Quantity));
+		Ctx.EventEmitter.Emit(new PickUpItemEvent(pickup.Id, pickup.Quantity));
 	}
 
 	private void OnTakeSomeSelected(ItemPickup pickup)

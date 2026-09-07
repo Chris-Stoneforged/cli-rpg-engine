@@ -1,4 +1,4 @@
-using Requests;
+using Events.Definitions.System;
 using View.Definitions;
 using View.Menu;
 
@@ -26,7 +26,7 @@ public class MainMenuView(IReadOnlyCollection<string> savePaths) : AView
 
 	private void OnNewGameSelected()
 	{
-		Ctx.RequestDispatcher.MakeRequest(new NewGameRequest());
+		Ctx.EventEmitter.Emit(new CreateSaveProfileEvent());
 	}
 
 	private void OnLoadGameSelected()
@@ -36,6 +36,6 @@ public class MainMenuView(IReadOnlyCollection<string> savePaths) : AView
 
 	private void OnQuitSelected()
 	{
-		Ctx.RequestDispatcher.MakeRequest(new QuitGameRequest());
+		Ctx.EventEmitter.Emit(new QuitGameEvent());
 	}
 }

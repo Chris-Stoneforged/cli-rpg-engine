@@ -1,8 +1,7 @@
 using Data;
 using Debug;
-using Microsoft.EntityFrameworkCore;
-using Requests;
-using Requests.Definitions;
+using Events.Definitions;
+using Events.Definitions.Game;
 
 namespace Controllers;
 
@@ -10,13 +9,13 @@ public class LocationController
 {
 	private readonly SessionFactory _sessionFactory;
 
-	public LocationController(IRequestListener listener, SessionFactory sessionFactory)
+	public LocationController(IEventHandler handler, SessionFactory sessionFactory)
 	{
 		_sessionFactory = sessionFactory;
-		listener.RegisterHandler<OpenDoorRequest>(HandleOpenDoorRequest);
+		handler.Register<OpenDoorEvent>(HandleOpenDoorEvent);
 	}
 
-	private void HandleOpenDoorRequest(OpenDoorRequest request)
+	private void HandleOpenDoorEvent(OpenDoorEvent request)
 	{
 		using var db = _sessionFactory.GetSession();
 

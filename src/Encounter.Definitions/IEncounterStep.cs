@@ -1,4 +1,4 @@
-namespace Core.Definitions;
+namespace Encounter.Definitions;
 
 public interface IEncounterStep
 {

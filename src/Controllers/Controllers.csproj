@@ -1,8 +1,6 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <ItemGroup>
-    <ProjectReference Include="..\Requests\Requests.csproj" />
-    <ProjectReference Include="..\Requests.Definitions\Requests.Definitions.csproj" />
     <ProjectReference Include="..\Events\Events.csproj" />
     <ProjectReference Include="..\Events.Definitions\Events.Definitions.csproj" />
     <ProjectReference Include="..\View\View.csproj" />

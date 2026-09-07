@@ -3,7 +3,7 @@ using Spectre.Console;
 using Data.Definitions.Entities;
 using Microsoft.EntityFrameworkCore;
 using Debug;
-using Requests;
+using Events.Definitions.Game;
 
 namespace View.Views;
 
@@ -53,6 +53,6 @@ public class ChatView : AView
 
 	private void OnCharacterSelected(Character character)
 	{
-		Ctx.RequestDispatcher.MakeRequest(new CharacterInteractionRequest(character.Id));
+		Ctx.EventEmitter.Emit(new CharacterInteractionEvent(character.Id));
 	}
 }

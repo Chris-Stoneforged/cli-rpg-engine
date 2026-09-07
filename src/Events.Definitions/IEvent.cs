@@ -1,3 +1,7 @@
 namespace Events.Definitions;
 
-public interface IEvent { }
+public interface IEvent
+{
+	bool IsConsumed { get; }
+	void Consume();
+}

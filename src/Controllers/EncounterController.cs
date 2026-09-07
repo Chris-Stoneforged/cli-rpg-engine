@@ -1,9 +1,6 @@
 using Data;
-using Data.Definitions.Entities;
-using Debug;
-using Microsoft.EntityFrameworkCore;
-using Requests;
-using Requests.Definitions;
+using Events.Definitions;
+using Events.Definitions.Game;
 using View.Definitions;
 using View.Views;
 
@@ -15,17 +12,17 @@ public class EncounterController
 	private readonly IViewManager _viewManager;
 
 	public EncounterController(
-		IRequestListener listener,
+		IEventHandler handler,
 		IViewManager viewManager,
 		SessionFactory sessionFactory
 	)
 	{
 		_sessionFactory = sessionFactory;
 		_viewManager = viewManager;
-		listener.RegisterHandler<CharacterInteractionRequest>(HandleCharacterInteractionRequest);
+		handler.Register<CharacterInteractionEvent>(HandleCharacterInteractionEvent);
 	}
 
-	private void HandleCharacterInteractionRequest(CharacterInteractionRequest request)
+	private void HandleCharacterInteractionEvent(CharacterInteractionEvent request)
 	{
 		_viewManager.ShowView(new EncounterView(1));
 	}

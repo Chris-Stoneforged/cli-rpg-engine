@@ -1,4 +1,4 @@
-using Requests;
+using Events.Definitions.System;
 using View.Definitions;
 using View.Menu;
 
@@ -21,12 +21,12 @@ public class OptionsView : AView
 
 	private void OnMainMenuSelected()
 	{
-		Ctx.RequestDispatcher.MakeRequest(new ReturnToMainMenuRequest());
+		Ctx.EventEmitter.Emit(new ReturnToMainMenuEvent());
 	}
 
 	private void OnSaveGameSelected()
 	{
-		Ctx.RequestDispatcher.MakeRequest(new SaveGameRequest());
+		Ctx.EventEmitter.Emit(new SaveGameEvent());
 	}
 
 	private void OnLoadGameSelected()

@@ -1,9 +1,8 @@
 using Data;
 using Data.Definitions.Entities;
 using Debug;
-using Microsoft.EntityFrameworkCore;
-using Requests;
-using Requests.Definitions;
+using Events.Definitions;
+using Events.Definitions.Game;
 
 namespace Controllers;
 
@@ -11,21 +10,21 @@ public class InventoryController
 {
 	private readonly SessionFactory _sessionFactory;
 
-	public InventoryController(IRequestListener listener, SessionFactory sessionFactory)
+	public InventoryController(IEventHandler handler, SessionFactory sessionFactory)
 	{
 		_sessionFactory = sessionFactory;
-		listener.RegisterHandler<PickUpItemRequest>(HandlePickUpItemRequest);
+		handler.Register<PickUpItemEvent>(HandlePickUpItemEvent);
 	}
 
-	private void HandlePickUpItemRequest(PickUpItemRequest request)
+	private void HandlePickUpItemEvent(PickUpItemEvent @event)
 	{
 		using var db = _sessionFactory.GetSession();
 
-		var pickup = db.ItemPickups.FirstOrDefault(p => p.Id == request.PickupId);
+		var pickup = db.ItemPickups.FirstOrDefault(p => p.Id == @event.PickupId);
 
 		if (pickup == null)
 		{
-			DebugLog.Error($"ItemPickup with Id {request.PickupId} does not exist");
+			DebugLog.Error($"ItemPickup with Id {@event.PickupId} does not exist");
 			return;
 		}
 
@@ -35,7 +34,7 @@ public class InventoryController
 			return;
 		}
 
-		if (request.Amount > pickup.Quantity)
+		if (@event.Amount > pickup.Quantity)
 		{
 			DebugLog.Error("Trying to pick up more of an item than is available");
 			return;
@@ -63,7 +62,7 @@ public class InventoryController
 				new InventoryEntry()
 				{
 					Item = pickup.Item,
-					Quantity = request.Amount
+					Quantity = @event.Amount
 				});
 		}
 		else
@@ -72,13 +71,13 @@ public class InventoryController
 			existingEntry.Quantity += pickup.Quantity;
 		}
 
-		if (request.Amount == pickup.Quantity)
+		if (@event.Amount == pickup.Quantity)
 		{
 			pickup.Location.ItemPickups.Remove(pickup);
 		}
 		else
 		{
-			pickup.Quantity -= request.Amount;
+			pickup.Quantity -= @event.Amount;
 		}
 
 		db.SaveChanges();

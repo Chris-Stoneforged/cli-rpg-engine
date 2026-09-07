@@ -3,43 +3,53 @@ using Events.Definitions;
 
 namespace Events;
 
-public class EventManager : IEventListener, IEventDispatcher
+public class EventManager : IEventTrigger, IEventHandler
 {
-	private interface IEventListener { }
-
-	private class EventListener<TEvent>(
-		Action<TEvent> callback
-	) : IEventListener where TEvent : IEvent
+	private class EventHandler<TEvent>(
+		Action<TEvent> callback,
+		int priority
+	)
 	{
 		public Action<TEvent> Callback { get; } = callback;
+		public int Priority { get; } = priority;
 	}
 
-	private readonly Dictionary<Type, List<IEventListener>> _eventListeners = [];
+	private readonly Dictionary<Type, List<object>> _requestHandlers = [];
 
-	public void DispatchEvent<TEvent>(TEvent @event) where TEvent : IEvent
+	public void Emit<TEvent>(TEvent @event) where TEvent : IEvent
 	{
-		if (!_eventListeners.TryGetValue(typeof(TEvent), out var listeners))
+		if (!_requestHandlers.TryGetValue(typeof(TEvent), out var handlers))
 		{
-			DebugLog.Warn($"No event listeners of type {typeof(TEvent).Name}");
+			DebugLog.Warn($"No request handers for type {typeof(TEvent).Name}");
 			return;
 		}
 
-		DebugLog.Info($"Dispatching event {@event}");
-		foreach (var listener in listeners)
+		DebugLog.Info($"Making request {@event}");
+		foreach (var handler in handlers)
 		{
-			if (listener is not EventListener<TEvent> typedListener) continue;
-			typedListener.Callback.Invoke(@event);
+			if (@event.IsConsumed) return;
+			if (handler is not EventHandler<TEvent> typedHandler) continue;
+			typedHandler.Callback.Invoke(@event);
 		}
 	}
 
-	public void RegisterListener<TEvent>(Action<TEvent> handler) where TEvent : IEvent
+	public void Register<TEvent>(
+		Action<TEvent> handler,
+		int priority = 0
+	) where TEvent : IEvent
 	{
-		if (!_eventListeners.TryGetValue(typeof(TEvent), out var handlers))
+		if (!_requestHandlers.TryGetValue(typeof(TEvent), out var handlers))
 		{
 			handlers = [];
-			_eventListeners.Add(typeof(TEvent), handlers);
+			_requestHandlers.Add(typeof(TEvent), handlers);
 		}
 
-		handlers.Add(new EventListener<TEvent>(handler));
+		// TODO: Insert in priority order
+		handlers.Add(new EventHandler<TEvent>(handler, priority));
+	}
+
+	public void Unregister<TEvent>(Action<TEvent> handler) where TEvent : IEvent
+	{
+		// TODO: this
 	}
 }

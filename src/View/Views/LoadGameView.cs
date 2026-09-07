@@ -1,4 +1,4 @@
-using Requests;
+using Events.Definitions.System;
 using View.Menu;
 using View.Menu.Displays;
 
@@ -29,6 +29,6 @@ public class LoadGameView(IReadOnlyCollection<string> savePaths) : AView
 
 	private void OnSaveProfileSelected(string path)
 	{
-		Ctx.RequestDispatcher.MakeRequest(new LoadGameRequest(path));
+		Ctx.EventEmitter.Emit(new LoadSaveProfileEvent(path));
 	}
 }

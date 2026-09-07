@@ -2,11 +2,12 @@
 
   <ItemGroup>
     <ProjectReference Include="..\View.Definitions\View.Definitions.csproj" />
-    <ProjectReference Include="..\Requests.Definitions\Requests.Definitions.csproj" />
-    <ProjectReference Include="..\Requests\Requests.csproj" />
+    <ProjectReference Include="..\Events.Definitions\Events.Definitions.csproj" />
+    <ProjectReference Include="..\Events\Events.csproj" />
     <ProjectReference Include="..\Debug\Debug.csproj" />
     <ProjectReference Include="..\Data.Definitions\Data.Definitions.csproj" />
     <ProjectReference Include="..\Encounter\Encounter.csproj" />
+    <ProjectReference Include="..\Encounter.Definitions\Encounter.Definitions.csproj" />
   </ItemGroup>
 
   <ItemGroup>

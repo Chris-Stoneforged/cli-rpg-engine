@@ -1,6 +1,6 @@
 using Data.Definitions;
 using Debug;
-using Requests.Definitions;
+using Events.Definitions;
 using Spectre.Console;
 using Spectre.Console.Rendering;
 using View.Definitions;
@@ -8,20 +8,20 @@ using View.Definitions;
 namespace View;
 
 public class ViewManager(
-	IRequestDispatcher requestDispatcher,
+	IEventTrigger eventEmitter,
 	ISessionFactory sessionFactory
 ) : IViewManager
 {
 	private readonly Stack<IView> _viewStack = new();
 	private readonly Dictionary<ViewKey, IView> _cachedViews = [];
-	private readonly IRequestDispatcher _requestDispatcher = requestDispatcher;
+	private readonly IEventTrigger _eventEmitter = eventEmitter;
 	private readonly ISessionFactory _sessionFactory = sessionFactory;
 
 	private ViewContext? _viewContext = null;
 
 	public void ShowView(IView view)
 	{
-		_viewContext ??= new ViewContext(this, _requestDispatcher, _sessionFactory);
+		_viewContext ??= new ViewContext(this, _eventEmitter, _sessionFactory);
 		if (view is AView aView)
 		{
 			aView.Initialize(_viewContext);
@@ -60,7 +60,6 @@ public class ViewManager(
 	public async Task Show()
 	{
 		AnsiConsole.Clear();
-		AnsiConsole.Write(RenderDebugLogs());
 		foreach (var view in _viewStack.Reverse())
 		{
 			var renderable = view.Before();

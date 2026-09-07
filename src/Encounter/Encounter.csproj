@@ -3,6 +3,8 @@
   <ItemGroup>
     <ProjectReference Include="..\Core.Definitions\Core.Definitions.csproj" />
     <ProjectReference Include="..\Data.Definitions\Data.Definitions.csproj" />
+    <ProjectReference Include="..\Encounter.Definitions\Encounter.Definitions.csproj" />
+    <ProjectReference Include="..\Debug\Debug.csproj" />
   </ItemGroup>
 
   <ItemGroup>

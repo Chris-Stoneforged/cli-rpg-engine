@@ -1,9 +1,9 @@
-using Requests;
 using View.Menu;
 using Spectre.Console;
 using Data.Definitions.Entities;
 using Microsoft.EntityFrameworkCore;
 using Debug;
+using Events.Definitions.Game;
 
 namespace View.Views;
 
@@ -51,6 +51,6 @@ public class NavigateView : AView
 	private void OnLocationSelected(Door door)
 	{
 		Ctx.ViewManager.Back();
-		Ctx.RequestDispatcher.MakeRequest(new OpenDoorRequest(door.Id));
+		Ctx.EventEmitter.Emit(new OpenDoorEvent(door.Id));
 	}
 }

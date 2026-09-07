@@ -2,12 +2,12 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Events\Events.csproj" />
-    <ProjectReference Include="..\Requests\Requests.csproj" />
     <ProjectReference Include="..\View\View.csproj" />
     <ProjectReference Include="..\Controllers\Controllers.csproj" />
     <ProjectReference Include="..\Debug\Debug.csproj" />
     <ProjectReference Include="..\View.Definitions\View.Definitions.csproj" />
     <ProjectReference Include="..\Data\Data.csproj" />
+    <ProjectReference Include="..\Events.Definitions\Events.Definitions.csproj" />
   </ItemGroup>
 
   <PropertyGroup>

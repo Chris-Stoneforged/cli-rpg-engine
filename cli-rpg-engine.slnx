@@ -6,12 +6,11 @@
     <Project Path="src/Data/Data.csproj" />
     <Project Path="src/Debug/Debug.csproj" />
     <Project Path="src/Editor/Editor.csproj" />
+    <Project Path="src/Encounter.Definitions/Encounter.Definitions.csproj" />
     <Project Path="src/Encounter/Encounter.csproj" />
+    <Project Path="src/Game/Game.csproj" />
     <Project Path="src/Events.Definitions/Events.Definitions.csproj" />
     <Project Path="src/Events/Events.csproj" />
-    <Project Path="src/Game/Game.csproj" />
-    <Project Path="src/Requests.Definitions/Requests.Definitions.csproj" />
-    <Project Path="src/Requests/Requests.csproj" />
     <Project Path="src/View.Definitions/View.Definitions.csproj" />
     <Project Path="src/View/View.csproj" />
   </Folder>
