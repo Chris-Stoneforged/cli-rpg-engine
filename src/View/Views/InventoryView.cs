@@ -31,7 +31,7 @@ public class InventoryView() : AView
 	private void OnInventoryItemSelected(InventoryEntry inventoryEntry)
 	{
 		new MenuBuilder()
-			.Title($"[bold]{inventoryEntry.Item.Name}[/] ({inventoryEntry.Quantity})\n\n[italic]{inventoryEntry.Item.Description}[/]")
+			.Title($"{inventoryEntry.Item.Name} ({inventoryEntry.Quantity})\n\n[italic]{inventoryEntry.Item.Description}[/]")
 			.HasBackOption(false)
 			.Execute(Ctx);
 	}

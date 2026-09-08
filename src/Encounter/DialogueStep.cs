@@ -10,9 +10,13 @@ public class DialogueStep(DialogueStepData data) :
 {
 	public async Task<int> Run()
 	{
-		var text = new Markup($"[bold]{_data.Speaker?.Name}[/]: {_data.Dialogue}");
-		AnsiConsole.Write(text);
-		AnsiConsole.Console.Input.ReadKey(false);
+		// Trailing \0 prevents SpectreConsole from appending a colon
+		var prompt = new TextPrompt<string>($"~{_data.Speaker?.Name}: {_data.Dialogue}\0")
+			.AllowEmpty()
+			.ClearOnFinish()
+			.Secret(null);
+
+		_ = AnsiConsole.Prompt(prompt);
 		return _data.NextStepId;
 	}
 }

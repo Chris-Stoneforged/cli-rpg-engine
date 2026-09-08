@@ -41,11 +41,24 @@ public class SearchView : AView
 
 	private void OnTakeAllSelected(ItemPickup pickup)
 	{
-		Ctx.EventEmitter.Emit(new PickUpItemEvent(pickup.Id, pickup.Quantity));
+		Ctx.EventEmitter.Emit(new PickUpItemEvent(pickup.Id, pickup.Item.Name, pickup.Quantity));
 	}
 
 	private void OnTakeSomeSelected(ItemPickup pickup)
 	{
+		var prompt = new TextPrompt<int>("Enter amount")
+			.DefaultValue(0)
+			.ShowDefaultValue(false)
+			.ClearOnFinish()
+			.Validate(
+				input => input >= 0 && input <= pickup.Quantity,
+				$"[red]Must be between 0 and {pickup.Quantity}[/]"
+			);
 
+		var amount = AnsiConsole.Prompt(prompt);
+		if (amount != 0)
+		{
+			Ctx.EventEmitter.Emit(new PickUpItemEvent(pickup.Id, pickup.Item.Name, amount));
+		}
 	}
 }

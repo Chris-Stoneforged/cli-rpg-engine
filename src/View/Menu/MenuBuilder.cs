@@ -94,7 +94,7 @@ public class MenuBuilder
 		}
 
 		_prompt
-			.Title(title)
+			.Title($"\n{title}")
 			.AddChoices(_menuOptions);
 
 		var choice = AnsiConsole.Prompt(_prompt);

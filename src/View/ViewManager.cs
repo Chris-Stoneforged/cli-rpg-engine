@@ -8,20 +8,21 @@ using View.Definitions;
 namespace View;
 
 public class ViewManager(
-	IEventTrigger eventEmitter,
+	IEventManager eventManager,
 	ISessionFactory sessionFactory
 ) : IViewManager
 {
 	private readonly Stack<IView> _viewStack = new();
 	private readonly Dictionary<ViewKey, IView> _cachedViews = [];
-	private readonly IEventTrigger _eventEmitter = eventEmitter;
+	private readonly IEventManager _eventManager = eventManager;
 	private readonly ISessionFactory _sessionFactory = sessionFactory;
+	private readonly GameLog.GameLog _gameLogs = new(eventManager);
 
 	private ViewContext? _viewContext = null;
 
 	public void ShowView(IView view)
 	{
-		_viewContext ??= new ViewContext(this, _eventEmitter, _sessionFactory);
+		_viewContext ??= new ViewContext(this, _eventManager, _sessionFactory);
 		if (view is AView aView)
 		{
 			aView.Initialize(_viewContext);
@@ -59,20 +60,22 @@ public class ViewManager(
 
 	public async Task Show()
 	{
-		AnsiConsole.Clear();
-		foreach (var view in _viewStack.Reverse())
-		{
-			var renderable = view.Before();
-			if (renderable != null)
-			{
-				AnsiConsole.Write(renderable);
-			}
-		}
+		//AnsiConsole.Clear();
+		//foreach (var view in _viewStack.Reverse())
+		//{
+		//	var renderable = view.Before();
+		//	if (renderable != null)
+		//	{
+		//		AnsiConsole.Write(renderable);
+		//	}
+		//}
 
 		if (_viewStack.TryPeek(out var currentView))
 		{
 			await currentView.Loop();
 		}
+
+		_gameLogs.FlushPending();
 	}
 
 	public void ResetStack()

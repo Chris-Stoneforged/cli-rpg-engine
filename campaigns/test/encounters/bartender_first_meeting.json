@@ -1,6 +1,13 @@
 {
 	"id": 1,
-	"repeatable": false,
+	"repeatable": true,
+	"repeat_step": 3,
+	"trigger":
+	{
+		"id": 1,
+		"type": "character_interaction",
+		"character_id": 1
+	},
 	"steps": 
 	[
 		{
@@ -14,6 +21,13 @@
 			"id": 2,
 			"type": "dialogue",
 			"dialogue": "You must be pretty lost to wind up here",
+			"speaker_id": 1,
+			"next_step_id": 3
+		},
+		{
+			"id": 3,
+			"type": "dialogue",
+			"dialogue": "Make yourself at home",
 			"speaker_id": 1,
 		}
 	]

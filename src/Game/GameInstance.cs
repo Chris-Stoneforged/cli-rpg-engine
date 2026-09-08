@@ -84,6 +84,7 @@ public class GameInstance
 		}
 
 		_sessionFactory.SetDatabasePath(path);
+		_encounterController.InitializeTriggers();
 		EnterGame();
 	}
 
@@ -95,6 +96,7 @@ public class GameInstance
 	void HandleLoadGameEvent(LoadSaveProfileEvent @event)
 	{
 		_sessionFactory.SetDatabasePath(@event.SavePath);
+		_encounterController.InitializeTriggers();
 		EnterGame();
 	}
 

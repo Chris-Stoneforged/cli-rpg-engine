@@ -13,7 +13,7 @@ public class InventoryController
 	public InventoryController(IEventHandler handler, SessionFactory sessionFactory)
 	{
 		_sessionFactory = sessionFactory;
-		handler.Register<PickUpItemEvent>(HandlePickUpItemEvent);
+		handler.Register<PickUpItemEvent>(HandlePickUpItemEvent, EventPriority.Controller);
 	}
 
 	private void HandlePickUpItemEvent(PickUpItemEvent @event)
@@ -81,5 +81,6 @@ public class InventoryController
 		}
 
 		db.SaveChanges();
+		//@event.Consume();
 	}
 }

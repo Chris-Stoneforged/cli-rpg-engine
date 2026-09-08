@@ -3,6 +3,7 @@ using Data.Definitions;
 using Data.Definitions.Entities;
 using Data.Definitions.Encounter;
 using Core.Definitions.Enums;
+using Data.Definitions.Triggers;
 
 namespace Data;
 
@@ -18,6 +19,8 @@ public class GameDatabase(string campaignPath) : DbContext, IGameDatabase
 	public DbSet<Encounter> Encounters { get; set; }
 	public DbSet<EncounterStepData> EncounterSteps { get; set; }
 	public DbSet<DialogueStepData> DialogueSteps { get; set; }
+	public DbSet<Trigger> Triggers { get; set; }
+	public DbSet<CharacterInteractionTrigger> CharacterEncounterTriggers { get; set; }
 
 	private readonly string _campaignPath = campaignPath;
 
@@ -72,5 +75,10 @@ public class GameDatabase(string campaignPath) : DbContext, IGameDatabase
 			.HasDiscriminator(e => e.Type)
 			.HasValue<EncounterStepData>(EncounterStepType.NONE)
 			.HasValue<DialogueStepData>(EncounterStepType.DIALOGUE);
+
+		modelBuilder.Entity<Trigger>()
+			.HasDiscriminator(e => e.Type)
+			.HasValue<Trigger>(TriggerType.NONE)
+			.HasValue<CharacterInteractionTrigger>(TriggerType.CHARACTER_INTERACTION);
 	}
 }
